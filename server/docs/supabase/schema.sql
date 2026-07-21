@@ -13,7 +13,12 @@ create extension if not exists "pgcrypto" schema "extensions";
 
 create type job_status as enum ('queued', 'processing', 'completed', 'failed');
 
-create type subtitle_style as enum ('classic', 'tiktok', 'minimal', 'cinema');
+create type subtitle_style as enum ('classic', 'tiktok', 'minimal', 'cinema', 'apple', 'netflix', 'youtube');
+
+-- Migration if the type already exists:
+-- alter type subtitle_style add value 'apple';
+-- alter type subtitle_style add value 'netflix';
+-- alter type subtitle_style add value 'youtube';
 
 -- ==========================================================================
 -- 2. TABLES

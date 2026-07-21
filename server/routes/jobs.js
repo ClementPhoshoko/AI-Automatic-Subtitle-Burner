@@ -29,7 +29,7 @@ const router = Router();
  *                 format: binary
  *               subtitle_style:
  *                 type: string
- *                 enum: [classic, tiktok, minimal, cinema]
+ *                 enum: [classic, tiktok, minimal, cinema, apple, netflix, youtube]
  *                 default: classic
  *     responses:
  *       201:

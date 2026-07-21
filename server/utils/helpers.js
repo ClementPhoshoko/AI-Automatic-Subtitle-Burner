@@ -7,7 +7,7 @@ const ALLOWED_MIMES = {
 
 const ALLOWED_EXTENSIONS = [".mp4", ".mov", ".avi", ".mkv"];
 
-const SUBTITLE_STYLES = ["classic", "tiktok", "minimal", "cinema"];
+const SUBTITLE_STYLES = ["classic", "tiktok", "minimal", "cinema", "apple", "netflix", "youtube"];
 
 function isValidVideo(mimetype, originalname) {
   const ext = "." + originalname.split(".").pop().toLowerCase();
