@@ -15,6 +15,9 @@
   text-decoration: none;
   cursor: pointer;
   transition: opacity var(--transition-fast);
+  -webkit-user-drag: none;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .nav__left:hover {

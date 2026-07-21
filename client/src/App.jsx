@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import Nav from './components/nav/Nav'
+import Footer from './components/footer/Footer'
+import Home from './pages/home/Home'
 import IntroOverlay from './components/intro/IntroOverlay'
 import './App.css'
 
@@ -13,9 +15,10 @@ function App() {
       <Nav />
       <main className="app__main">
         <Routes>
-          <Route path="/" element={null} />
+          <Route path="/" element={<Home />} />
         </Routes>
       </main>
+      <Footer />
     </div>
   )
 }

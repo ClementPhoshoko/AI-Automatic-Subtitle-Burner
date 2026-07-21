@@ -90,18 +90,10 @@ function IntroOverlay({ onDone }) {
         </motion.div>
 
         <motion.p
-          className="intro-tagline"
+          className={`intro-tagline${phase === 'intro' ? ' intro-tagline--blink' : ''}`}
           initial={{ opacity: 0, y: 12 }}
-          animate={
-            phase === 'intro'
-              ? { opacity: [0, 1, 0, 1, 0, 1], y: 0 }
-              : { opacity: 0, y: -8 }
-          }
-          transition={
-            phase === 'intro'
-              ? { duration: 2.2, times: [0, 0.15, 0.3, 0.45, 0.6, 1], ease: 'easeInOut' }
-              : { duration: 0.3, ease: 'easeOut' }
-          }
+          animate={phase !== 'intro' ? { opacity: 0, y: -8 } : { y: 0 }}
+          transition={phase !== 'intro' ? { duration: 0.3, ease: 'easeOut' } : { duration: 0.01 }}
         >
           captions worth watching
         </motion.p>

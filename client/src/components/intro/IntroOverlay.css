@@ -45,3 +45,16 @@
   margin: 0;
   letter-spacing: 0.08em;
 }
+
+.intro-tagline--blink {
+  animation: tagline-blink 2.2s ease-in-out both;
+}
+
+@keyframes tagline-blink {
+  0%   { opacity: 0; }
+  15%  { opacity: 1; }
+  30%  { opacity: 0; }
+  45%  { opacity: 1; }
+  60%  { opacity: 0; }
+  100% { opacity: 1; }
+}

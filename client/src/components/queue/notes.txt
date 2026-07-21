@@ -1,0 +1,36 @@
+QueueTracker — Component Prompt
+=================================
+
+Build a QueueTracker component that polls the public API (`GET /api/jobs`) and
+displays a live queue status card. No auth needed — the API is fully open.
+
+Backend API:
+  GET /api/jobs?status=queued       → { jobs: [...], total: N }
+  GET /api/jobs?status=processing   → { jobs: [...], total: N }
+  GET /api/jobs?limit=8             → { jobs: [...], total: N }
+  (all results ordered by created_at DESC)
+
+States to handle:
+  - Loading: show "—" for counts, skeleton placeholder for job list
+  - Empty: "No jobs yet" when total === 0
+  - Error: show error message (e.g. API unreachable)
+  - Data: show counts + recent job list (scrollable, max 8 items)
+
+Display:
+  Card container using our design tokens (--surface, --border, --radius-xl,
+  --shadow-sm). Title "Queue" with --text-primary.
+
+  Stats section:
+    "In queue"      → count, colored --warning
+    "Processing"    → count, colored --primary
+    (use .status-badge pattern from design-tokens.css)
+
+  Recent jobs list:
+    Each row: status badge (.status-badge .status-{status}) + truncated job ID
+    (first 8 chars of UUID in --font-mono) + relative time (e.g. "2m ago")
+    Scroll if > 4 items, max-height around 200px.
+
+  Footer (optional):
+    Show "View all jobs" link → navigate to /jobs page (React Router Link)
+
+Polling interval: 5 seconds. Clean up on unmount.

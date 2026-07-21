@@ -1,0 +1,175 @@
+Build a dedicated **Queue Tracker** column on the left side of the processing page. This component is responsible only for displaying the current processing queue in real time using the existing backend APIs. Do not create any backend logic.
+
+## Layout
+
+The Queue Tracker should remain visible while the user is on the page.
+
+Structure the column into four sections:
+
+1. Queue Summary
+2. User Status
+3. Queue List
+4. Queue Footer
+
+---
+
+## 1. Queue Summary
+
+Display three statistics at the top:
+
+- Queue Depth
+  - Total number of jobs currently waiting
+
+- Processing
+  - Number of jobs actively being processed
+
+- Completed Recently (optional if backend supports it)
+  - Number of recently completed jobs
+
+These values should update automatically whenever queue data changes.
+
+---
+
+## 2. User Status
+
+Display information about the current user's uploaded job.
+
+Possible states:
+
+- Waiting in Queue
+- Processing
+- Completed
+- Failed
+- Cancelled
+
+If waiting, display:
+
+- Current queue position
+- Estimated wait time (if available)
+- Number of jobs ahead
+
+If processing:
+
+- Current stage
+- Progress percentage
+- Current processing step
+
+If completed:
+
+- Ready for download indicator
+
+If failed:
+
+- Failure reason
+- Retry action (if supported)
+
+This card should always stay pinned near the top because it is the most important information for the user.
+
+---
+
+## 3. Queue List
+
+Display a vertically scrollable list of queued jobs.
+
+Each row should contain:
+
+- Queue number
+- Job name
+- Time submitted
+- Current status badge
+- Queue position
+- Small progress indicator (only for processing jobs)
+
+If the row belongs to the current user:
+
+- Highlight it
+- Display a "You" indicator
+- Keep it visible when possible
+
+Possible status badges:
+
+- Waiting
+- Processing
+- Completed
+- Failed
+
+Display rows in queue order.
+
+If backend provides priority jobs, respect the ordering.
+
+---
+
+## 4. Queue Footer
+
+Display useful queue information such as:
+
+- Estimated wait time
+- Last queue update time
+- Live connection status
+
+Example information:
+
+Queue updates automatically.
+Estimated wait: X minutes.
+Connected.
+
+---
+
+## Behaviour
+
+The component should:
+
+- Update automatically from backend events or polling.
+- Never require page refresh.
+- Smoothly animate position changes.
+- Animate new jobs entering.
+- Animate completed jobs leaving.
+- Maintain scroll position while updates occur.
+- Show loading skeletons while data loads.
+- Handle empty queue state.
+- Handle connection loss gracefully.
+- Retry fetching automatically after temporary failures.
+
+---
+
+## Empty State
+
+If there are no jobs:
+
+Display an empty state explaining that the queue is currently empty and new uploads will appear here once submitted.
+
+---
+
+## Responsive Behaviour
+
+Desktop:
+- Fixed left column.
+- Main content remains on the right.
+
+Tablet:
+- Narrower column.
+
+Mobile:
+- Collapse into a section above the main processing content.
+- Allow the queue list to expand/collapse.
+
+---
+
+## Accessibility
+
+- Use semantic HTML.
+- Ensure keyboard navigation.
+- Announce queue position changes for screen readers.
+- Do not rely solely on visual indicators for status.
+
+---
+
+## Backend Integration
+
+Use the existing backend endpoints only.
+
+Consume existing queue data and map fields into the UI.
+
+Do not modify backend APIs.
+
+The component should be reusable, isolated, and easy to integrate into the existing processing page without affecting other UI components.
