@@ -1,0 +1,16 @@
+/* ==========================================================================
+   DARK THEME — Not pure black
+   Overrides color tokens when `.theme-dark` is applied to <html>.
+   All shared tokens (spacing, radius, etc.) come from design-tokens.css.
+   ========================================================================== */
+
+@import './design-tokens.css';
+
+/*
+  The `.theme-dark` overrides are defined inside design-tokens.css alongside
+  the `:root` defaults. This file serves as the import entry point so that
+  consumers can explicitly import either theme-light or theme-dark.
+
+  No additional overrides needed here — dark tokens are already scoped under
+  `.theme-dark` in design-tokens.css.
+*/

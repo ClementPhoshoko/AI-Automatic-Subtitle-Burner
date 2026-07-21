@@ -1,0 +1,13 @@
+/* ==========================================================================
+   LIGHT THEME — Apple-inspired
+   Inherits all shared tokens from design-tokens.css.
+   Light theme is the default (:root), so this file exists as an explicit
+   entry point and to ensure `.theme-light` class works for clarity.
+   ========================================================================== */
+
+@import './design-tokens.css';
+
+/* Explicit light theme class for when JS toggles themes */
+.theme-light {
+  /* All light values are already the defaults on :root in design-tokens.css */
+}
