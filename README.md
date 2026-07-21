@@ -58,7 +58,7 @@ The application should support asynchronous processing through a background work
 - Upload MP4, MOV, AVI, and MKV videos.
 - Upload directly to Supabase Storage.
 - Display upload progress.
-- Configurable maximum upload size.
+- Configurable maximum upload size (default 150MB on 1GB RAM VPS).
 - Create a processing job after upload.
 
 ### Job Management
@@ -340,7 +340,7 @@ Retry processing up to three times before marking a job as `failed`.
 - Stream files where possible.
 - Delete temporary files immediately after processing.
 - Keep CPU and memory usage low.
-- Support deployment on low-resource VPS environments.
+- Support deployment on low-resource VPS environments (1GB RAM supports videos up to ~150MB at 1080p).
 
 ---
 
@@ -367,7 +367,7 @@ SUPABASE_SERVICE_ROLE_KEY=
 
 GEMINI_API_KEY=
 
-MAX_FILE_SIZE_MB=500
+MAX_FILE_SIZE_MB=150
 WORKER_ENABLED=false
 FFMPEG_PATH=ffmpeg
 GEMINI_MODEL=gemini-2.0-flash
