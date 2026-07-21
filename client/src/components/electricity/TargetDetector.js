@@ -46,11 +46,30 @@ function getRandomElement() {
   return els[Math.floor(Math.random() * els.length)]
 }
 
+function getRandomViewportPoint() {
+  return {
+    cx: Math.random() * window.innerWidth,
+    cy: Math.random() * window.innerHeight,
+    width: 0,
+    height: 0,
+    el: null,
+  }
+}
+
 function getNearbyPair(maxDist) {
   const els = getVisibleElements()
-  if (els.length < 2) return null
+  if (!els.length) return null
 
   const maxD = maxDist || config.target.maxDistance
+
+  // 35% chance: bolt from a random viewport point to a random element
+  if (Math.random() < 0.35) {
+    const a = getRandomViewportPoint()
+    const b = els[Math.floor(Math.random() * els.length)]
+    return { a, b, dist: 0 }
+  }
+
+  if (els.length < 2) return null
 
   for (let attempts = 0; attempts < 15; attempts++) {
     const a = els[Math.floor(Math.random() * els.length)]
@@ -68,4 +87,4 @@ function getNearbyPair(maxDist) {
   return a === b ? null : { a, b, dist: 0 }
 }
 
-export { getVisibleElements, getRandomElement, getNearbyPair }
+export { getVisibleElements, getRandomElement, getRandomViewportPoint, getNearbyPair }

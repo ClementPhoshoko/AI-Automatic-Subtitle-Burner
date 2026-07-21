@@ -13,6 +13,22 @@ function hexToRgba(hex, alpha) {
   return `rgba(${parseInt(result[1], 16)},${parseInt(result[2], 16)},${parseInt(result[3], 16)},${alpha})`
 }
 
+function segLen(s) {
+  const dx = s.x2 - s.x1
+  const dy = s.y2 - s.y1
+  return Math.sqrt(dx * dx + dy * dy)
+}
+
+function totalLength(segments) {
+  let len = 0
+  for (const s of segments) len += segLen(s)
+  return len
+}
+
+function drawProgress(progress) {
+  return Math.min(progress / 0.65, 1)
+}
+
 function ElectricityOverlay() {
   const svgRef = useRef(null)
   const [ready, setReady] = useState(false)
@@ -26,29 +42,31 @@ function ElectricityOverlay() {
 
     let inner = ''
 
-    // Render bolts — core only, no glow
     for (const bolt of bolts) {
       const elapsed = performance.now() - bolt.createdAt
       if (elapsed > bolt.lifetime) continue
       const progress = elapsed / bolt.lifetime
+      const draw = drawProgress(progress)
       const flicker = 1 - Math.random() * config.bolt.flickerFrequency
       const alpha = config.bolt.coreOpacity * flicker * (1 - progress)
 
       const mainD = BoltD(bolt.segments)
-      const branchDs = bolt.branches.map((b) => BoltD(b))
+      const mainLen = totalLength(bolt.segments)
+      const offset = mainLen * (1 - draw)
 
-      // main bolt
-      inner += `<path d="${mainD}" fill="none" stroke="${hexToRgba(primary, alpha)}" stroke-width="${bolt.thickness}" stroke-linecap="round" stroke-linejoin="round"/>`
-      // white core
-      inner += `<path d="${mainD}" fill="none" stroke="rgba(255,255,255,${alpha * 0.5})" stroke-width="${Math.max(bolt.thickness * 0.4, 0.3)}" stroke-linecap="round" stroke-linejoin="round"/>`
+      // main bolt — draws from start to end
+      inner += `<path d="${mainD}" fill="none" stroke="${hexToRgba(primary, alpha)}" stroke-width="${bolt.thickness}" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="${mainLen}" stroke-dashoffset="${offset}"/>`
+      inner += `<path d="${mainD}" fill="none" stroke="rgba(255,255,255,${alpha * 0.5})" stroke-width="${Math.max(bolt.thickness * 0.4, 0.3)}" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="${mainLen}" stroke-dashoffset="${offset}"/>`
 
-      for (const bD of branchDs) {
-        inner += `<path d="${bD}" fill="none" stroke="${hexToRgba(primary, alpha * 0.7)}" stroke-width="${Math.max(bolt.thickness * 0.45, 0.3)}" stroke-linecap="round" stroke-linejoin="round"/>`
-        inner += `<path d="${bD}" fill="none" stroke="rgba(255,255,255,${alpha * 0.35})" stroke-width="${Math.max(bolt.thickness * 0.25, 0.2)}" stroke-linecap="round" stroke-linejoin="round"/>`
+      for (const bD of bolt.branches) {
+        const bLen = totalLength(bD)
+        const bOff = bLen * (1 - draw)
+        inner += `<path d="${BoltD(bD)}" fill="none" stroke="${hexToRgba(primary, alpha * 0.7)}" stroke-width="${Math.max(bolt.thickness * 0.45, 0.3)}" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="${bLen}" stroke-dashoffset="${bOff}"/>`
+        inner += `<path d="${BoltD(bD)}" fill="none" stroke="rgba(255,255,255,${alpha * 0.35})" stroke-width="${Math.max(bolt.thickness * 0.25, 0.2)}" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="${bLen}" stroke-dashoffset="${bOff}"/>`
       }
     }
 
-    // Render sparks — core only, no glow
+    // Render sparks
     for (const s of sparks) {
       const progress = s.elapsed / s.lifetime
       const alpha = (1 - progress) * 0.85
@@ -69,7 +87,6 @@ function ElectricityOverlay() {
     const primary = getComputedColor('--primary') || '#6366f1'
     start(primary, handleUpdate)
 
-    // Activity detection
     const onActivity = () => {
       handleActivity()
       clearTimeout(idleTimer.current)
