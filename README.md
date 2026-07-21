@@ -146,7 +146,7 @@ Frontend (React/Vite)  ──►  Backend (Express)  ──►  Supabase (Postgr
 | Database    | Supabase PostgreSQL               |
 | Storage     | Supabase Storage                  |
 | AI          | Google Gemini API                 |
-| Background  | BullMQ (or custom queue)          |
+| Background  | Custom polling worker             |
 
 ---
 
@@ -170,6 +170,7 @@ server/
     ffmpeg/
     middleware/
     utils/
+    docs/
 ```
 
 ---
@@ -220,13 +221,15 @@ Supabase Storage buckets:
 
 ## 11. API Specification
 
-| Method   | Endpoint               | Description         |
-|----------|------------------------|---------------------|
-| `POST`   | `/upload`              | Upload a video      |
-| `GET`    | `/jobs`                | List all jobs       |
-| `GET`    | `/jobs/:id`            | Get job details     |
-| `POST`   | `/jobs/:id/process`    | Trigger processing  |
-| `DELETE` | `/jobs/:id`            | Delete a job        |
+| Method   | Endpoint                    | Description                          |
+|----------|-----------------------------|--------------------------------------|
+| `GET`    | `/api/health`               | Health check                        |
+| `GET`    | `/api-docs`                 | Swagger UI                          |
+| `POST`   | `/api/jobs/upload`          | Upload video + create job           |
+| `GET`    | `/api/jobs`                 | List jobs (supports pagination)     |
+| `GET`    | `/api/jobs/:id`             | Get job details                     |
+| `POST`   | `/api/jobs/:id/process`     | Trigger processing                  |
+| `DELETE` | `/api/jobs/:id`             | Delete job + cleanup storage files  |
 
 ---
 
@@ -357,13 +360,17 @@ Retry processing up to three times before marking a job as `failed`.
 Required environment variables:
 
 ```
-PORT=
+PORT=3001
 
 SUPABASE_URL=
 SUPABASE_SERVICE_ROLE_KEY=
-SUPABASE_STORAGE_BUCKET=
 
 GEMINI_API_KEY=
+
+MAX_FILE_SIZE_MB=500
+WORKER_ENABLED=false
+FFMPEG_PATH=ffmpeg
+GEMINI_MODEL=gemini-2.0-flash
 ```
 
 ---
