@@ -6,18 +6,14 @@ const { extractAudio } = require("../ffmpeg/extract");
 const { transcribeAudio } = require("../services/gemini");
 const { generateAss } = require("../services/subtitle");
 const { burnSubtitles } = require("../ffmpeg/burn");
+const logger = require("../utils/logger");
 
 const POLL_INTERVAL_MS = 5000;
 const STALE_SWEEP_MS = 60000;
 const STALE_TIMEOUT_MIN = 10;
 const MAX_CONCURRENCY = 2;
-const isDev = process.env.NODE_ENV === "development";
 
 const activeJobs = new Set();
-
-function log(...args) {
-  if (isDev) console.log(`[Worker]`, ...args);
-}
 
 /* ─── Streaming download ─── */
 
@@ -50,23 +46,23 @@ async function processJob(job) {
   try {
     fs.mkdirSync(tmpDir, { recursive: true });
 
-    log(`[${jobId}] Downloading video...`);
+    logger.info(`[${jobId}] Downloading video...`);
     const videoPath = path.join(tmpDir, "input.mp4");
     await downloadFile(job.original_video_url, videoPath);
 
-    log(`[${jobId}] Extracting audio...`);
+    logger.info(`[${jobId}] Extracting audio...`);
     const audioPath = await extractAudio(videoPath, tmpDir);
 
-    log(`[${jobId}] Transcribing with Gemini...`);
+    logger.info(`[${jobId}] Transcribing with Gemini...`);
     const transcript = await transcribeAudio(audioPath);
 
-    log(`[${jobId}] Generating subtitles...`);
+    logger.info(`[${jobId}] Generating subtitles...`);
     const assPath = await generateAss(transcript, job.subtitle_style, tmpDir);
 
-    log(`[${jobId}] Burning subtitles...`);
+    logger.info(`[${jobId}] Burning subtitles...`);
     const outputPath = await burnSubtitles(videoPath, assPath, tmpDir);
 
-    log(`[${jobId}] Uploading processed video...`);
+    logger.info(`[${jobId}] Uploading processed video...`);
     const fileName = `job_${jobId}_processed.mp4`;
     const fileStream = fs.createReadStream(outputPath);
 
@@ -83,7 +79,7 @@ async function processJob(job) {
       .from("processed")
       .getPublicUrl(fileName);
 
-    log(`[${jobId}] Updating job as completed...`);
+    logger.info(`[${jobId}] Updating job as completed...`);
     const { error: completeError } = await supabase.rpc("complete_job", {
       p_job_id: jobId,
       p_output_video_url: publicUrlData.publicUrl,
@@ -92,20 +88,16 @@ async function processJob(job) {
 
     if (completeError) throw new Error(`Failed to complete job: ${completeError.message}`);
 
-    log(`[${jobId}] Done.`);
+    logger.info(`[${jobId}] Done.`);
   } catch (err) {
-    log(`[${jobId}] Failed:`, err.message);
+    logger.error(`[${jobId}] Failed`, { job: jobId, error: err.message });
 
     const { error: failError } = await supabase.rpc("fail_job", {
       p_job_id: jobId,
       p_error_message: err.message,
     });
 
-    if (failError) console.error(`[${jobId}] Failed to update error status:`, failError.message);
-
-    if (isDev) {
-      console.error(err);
-    }
+    if (failError) logger.error(`[${jobId}] Failed to update error status`, { error: failError.message });
   } finally {
     fs.rmSync(tmpDir, { recursive: true, force: true });
     activeJobs.delete(jobId);
@@ -127,16 +119,15 @@ async function claimAndProcess() {
 
   if (error) {
     if (error.code === "PGRST116") return; // no rows matched — normal
-    console.error("[Worker] Claim error:", error.message);
+    logger.error("[Worker] Claim error", { error: error.message });
     return;
   }
 
   activeJobs.add(job.id);
-  log(`[${job.id}] Claimed (active: ${activeJobs.size})`);
+  logger.info(`[${job.id}] Claimed`, { active: activeJobs.size });
 
-  // Process in background — errors are handled inside processJob
   processJob(job).catch((err) => {
-    console.error(`[${job.id}] Unhandled process error:`, err.message);
+    logger.error(`[${job.id}] Unhandled process error`, { error: err.message });
   });
 }
 
@@ -165,13 +156,13 @@ async function requeueStaleJobs() {
     .lt("created_at", cutoff);
 
   if (error) {
-    console.error("[Worker] Stale check error:", error.message);
+    logger.error("Stale check error", { error: error.message });
     return;
   }
 
   if (!stale || stale.length === 0) return;
 
-  log(`Re-queuing ${stale.length} stale processing job(s)...`);
+  logger.info(`Re-queuing stale jobs`, { count: stale.length });
 
   for (const job of stale) {
     const { error: reqErr } = await supabase.rpc("requeue_job", {
@@ -179,7 +170,7 @@ async function requeueStaleJobs() {
     });
     if (reqErr) {
       // If requeue fails (e.g. retry_count >= 3), leave it as failed
-      console.error(`[Worker] Failed to re-queue stale job ${job.id}:`, reqErr.message);
+      logger.error("Failed to re-queue stale job", { job: job.id, error: reqErr.message });
     }
   }
 }
@@ -187,7 +178,7 @@ async function requeueStaleJobs() {
 /* ─── Start ─── */
 
 function start() {
-  log(`Worker started (concurrency: ${MAX_CONCURRENCY}, poll: ${POLL_INTERVAL_MS / 1000}s)`);
+  logger.info("Worker started", { concurrency: MAX_CONCURRENCY, pollInterval: POLL_INTERVAL_MS / 1000 });
 
   // Recover stale jobs on startup
   requeueStaleJobs();

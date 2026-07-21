@@ -1,4 +1,5 @@
 const { Router } = require("express");
+const rateLimit = require("express-rate-limit");
 const upload = require("../middleware/upload");
 const {
   uploadVideo,
@@ -9,6 +10,14 @@ const {
 } = require("../controllers/jobs");
 
 const router = Router();
+
+const uploadLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 5,
+  message: { error: "Too many uploads. Try again in a minute." },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
 
 /**
  * @openapi
@@ -37,7 +46,7 @@ const router = Router();
  *       400:
  *         description: Invalid file or style
  */
-router.post("/upload", upload.single("video"), uploadVideo);
+router.post("/upload", uploadLimiter, upload.single("video"), uploadVideo);
 
 /**
  * @openapi

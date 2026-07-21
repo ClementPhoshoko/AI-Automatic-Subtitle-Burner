@@ -1,6 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 const supabase = require("../services/supabase");
+const logger = require("../utils/logger");
 const { sanitizeFilename, SUBTITLE_STYLES } = require("../utils/helpers");
 
 const BUCKET_UPLOADS = "uploads";
@@ -30,7 +31,7 @@ async function uploadVideo(req, res) {
     fs.unlinkSync(req.file.path);
 
     if (uploadError) {
-      console.error("Supabase upload error:", uploadError);
+      logger.error("Supabase upload error:", uploadError);
       return res.status(500).json({ error: "Failed to upload video to storage" });
     }
 
@@ -47,7 +48,7 @@ async function uploadVideo(req, res) {
       });
 
     if (dbError) {
-      console.error("DB create_job error:", dbError);
+      logger.error("DB create_job error:", dbError);
       await supabase.storage.from(BUCKET_UPLOADS).remove([remoteName]);
       return res.status(500).json({ error: "Failed to create job" });
     }
@@ -56,7 +57,7 @@ async function uploadVideo(req, res) {
 
     res.status(201).json(jobRow);
   } catch (err) {
-    console.error("Upload error:", err);
+    logger.error("Upload error:", err);
     if (req.file && fs.existsSync(req.file.path)) {
       fs.unlinkSync(req.file.path);
     }
@@ -81,13 +82,13 @@ async function listJobs(req, res) {
     const { data, error, count } = await query;
 
     if (error) {
-      console.error("List jobs error:", error);
+      logger.error("List jobs error:", error);
       return res.status(500).json({ error: "Failed to fetch jobs" });
     }
 
     res.json({ jobs: data, total: count, limit: Number(limit), offset: Number(offset) });
   } catch (err) {
-    console.error("List jobs error:", err);
+    logger.error("List jobs error:", err);
     res.status(500).json({ error: err.message || "Internal server error" });
   }
 }
@@ -106,13 +107,13 @@ async function getJob(req, res) {
       if (error.code === "PGRST116") {
         return res.status(404).json({ error: "Job not found" });
       }
-      console.error("Get job error:", error);
+      logger.error("Get job error:", error);
       return res.status(500).json({ error: "Failed to fetch job" });
     }
 
     res.json(data);
   } catch (err) {
-    console.error("Get job error:", err);
+    logger.error("Get job error:", err);
     res.status(500).json({ error: err.message || "Internal server error" });
   }
 }
@@ -138,13 +139,13 @@ async function processJob(req, res) {
     const { error: updateError } = await supabase.rpc("mark_job_processing", { p_job_id: id });
 
     if (updateError) {
-      console.error("Process job error:", updateError);
+      logger.error("Process job error:", updateError);
       return res.status(500).json({ error: "Failed to start processing" });
     }
 
     res.json({ message: "Processing started", job_id: id });
   } catch (err) {
-    console.error("Process job error:", err);
+    logger.error("Process job error:", err);
     res.status(500).json({ error: err.message || "Internal server error" });
   }
 }
@@ -185,13 +186,13 @@ async function deleteJob(req, res) {
       .eq("id", id);
 
     if (deleteError) {
-      console.error("Delete job error:", deleteError);
+      logger.error("Delete job error:", deleteError);
       return res.status(500).json({ error: "Failed to delete job" });
     }
 
     res.json({ message: "Job deleted", id });
   } catch (err) {
-    console.error("Delete job error:", err);
+    logger.error("Delete job error:", err);
     res.status(500).json({ error: err.message || "Internal server error" });
   }
 }
