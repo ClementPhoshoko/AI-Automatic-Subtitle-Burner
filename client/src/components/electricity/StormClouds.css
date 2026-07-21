@@ -1,0 +1,220 @@
+.storm {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 40vh;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+
+  mask-image: linear-gradient(to bottom, black 45%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, black 45%, transparent 100%);
+}
+
+/* Deep background haze */
+.storm__haze {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 130% 60% at 40% 20%, rgba(25, 22, 45, 0.30) 0%, transparent 65%),
+    radial-gradient(ellipse 100% 50% at 70% 30%, rgba(30, 25, 50, 0.20) 0%, transparent 60%);
+  filter: blur(70px);
+  animation: haze-drift 60s ease-in-out infinite;
+}
+
+/* Cloud puffs — organic cloud shapes */
+.storm__puff {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(40px);
+  will-change: transform;
+}
+
+.storm__puff--1 {
+  width: 420px;
+  height: 280px;
+  top: -5%;
+  left: -8%;
+  background: radial-gradient(ellipse 60% 50% at 40% 50%, rgba(45, 38, 72, 0.40) 0%, transparent 70%);
+  filter: blur(50px);
+  animation: puff-drift-1 35s ease-in-out infinite;
+}
+
+.storm__puff--2 {
+  width: 380px;
+  height: 300px;
+  top: -2%;
+  left: 15%;
+  background: radial-gradient(ellipse 50% 55% at 50% 50%, rgba(55, 42, 80, 0.35) 0%, transparent 65%);
+  filter: blur(45px);
+  animation: puff-drift-2 30s ease-in-out infinite;
+}
+
+.storm__puff--3 {
+  width: 500px;
+  height: 260px;
+  top: -8%;
+  right: -5%;
+  background: radial-gradient(ellipse 55% 45% at 50% 50%, rgba(40, 35, 68, 0.35) 0%, transparent 60%);
+  filter: blur(55px);
+  animation: puff-drift-3 40s ease-in-out infinite;
+}
+
+.storm__puff--4 {
+  width: 340px;
+  height: 240px;
+  top: 5%;
+  left: 40%;
+  background: radial-gradient(ellipse 50% 50% at 50% 50%, rgba(60, 48, 88, 0.25) 0%, transparent 55%);
+  filter: blur(35px);
+  animation: puff-drift-4 28s ease-in-out infinite;
+}
+
+.storm__puff--5 {
+  width: 300px;
+  height: 200px;
+  top: 10%;
+  left: -3%;
+  background: radial-gradient(ellipse 45% 50% at 50% 50%, rgba(50, 40, 78, 0.20) 0%, transparent 55%);
+  filter: blur(30px);
+  animation: puff-drift-5 32s ease-in-out infinite;
+}
+
+.storm__puff--6 {
+  width: 360px;
+  height: 220px;
+  top: 8%;
+  right: 10%;
+  background: radial-gradient(ellipse 50% 45% at 50% 50%, rgba(45, 38, 72, 0.22) 0%, transparent 50%);
+  filter: blur(38px);
+  animation: puff-drift-6 36s ease-in-out infinite;
+}
+
+/* Wispy stretched cloud layers */
+.storm__wisp {
+  position: absolute;
+  filter: blur(60px);
+  will-change: transform;
+}
+
+.storm__wisp--a {
+  width: 600px;
+  height: 120px;
+  top: 12%;
+  left: -10%;
+  background: linear-gradient(90deg, transparent 0%, rgba(50, 40, 78, 0.15) 30%, rgba(45, 38, 72, 0.12) 60%, transparent 100%);
+  animation: wisp-a 45s ease-in-out infinite;
+}
+
+.storm__wisp--b {
+  width: 500px;
+  height: 100px;
+  top: 18%;
+  right: -8%;
+  background: linear-gradient(90deg, transparent 0%, rgba(40, 35, 68, 0.12) 40%, rgba(55, 42, 80, 0.10) 70%, transparent 100%);
+  animation: wisp-b 38s ease-in-out infinite;
+}
+
+/* Atmospheric mist */
+.storm__mist {
+  position: absolute;
+  top: 30%;
+  left: -5%;
+  width: 110%;
+  height: 70%;
+  background:
+    radial-gradient(ellipse 100% 50% at 30% 40%, rgba(60, 50, 90, 0.10) 0%, transparent 60%),
+    radial-gradient(ellipse 80% 40% at 70% 50%, rgba(40, 35, 65, 0.08) 0%, transparent 55%);
+  filter: blur(50px);
+  animation: mist-drift 42s ease-in-out infinite;
+}
+
+/* Flash overlay */
+.storm__flash {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 120% 80% at 50% 20%, rgba(130, 110, 240, 0.18) 0%, rgba(80, 60, 200, 0.06) 40%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.06s ease-out;
+  pointer-events: none;
+}
+
+.storm-flash-active {
+  opacity: 1 !important;
+  transition: opacity 0s !important;
+}
+
+/* Animations */
+@keyframes haze-drift {
+  0%, 100% { transform: translateX(0) scale(1); }
+  33% { transform: translateX(3%) scale(1.02); }
+  66% { transform: translateX(-2%) scale(0.98); }
+}
+
+@keyframes puff-drift-1 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  25% { transform: translate(30px, -10px) scale(1.05); }
+  50% { transform: translate(10px, 15px) scale(0.96); }
+  75% { transform: translate(40px, -5px) scale(1.03); }
+}
+
+@keyframes puff-drift-2 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(-25px, 8px) scale(1.04); }
+  66% { transform: translate(15px, -12px) scale(0.95); }
+}
+
+@keyframes puff-drift-3 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  25% { transform: translate(-20px, -15px) scale(1.06); }
+  50% { transform: translate(-40px, 5px) scale(0.97); }
+  75% { transform: translate(-10px, -8px) scale(1.02); }
+}
+
+@keyframes puff-drift-4 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(20px, 10px) scale(1.03); }
+  66% { transform: translate(-15px, -8px) scale(0.96); }
+}
+
+@keyframes puff-drift-5 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  25% { transform: translate(15px, 5px) scale(1.04); }
+  50% { transform: translate(-10px, 15px) scale(0.97); }
+  75% { transform: translate(20px, 0) scale(1.02); }
+}
+
+@keyframes puff-drift-6 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(-18px, -8px) scale(1.05); }
+  66% { transform: translate(12px, 10px) scale(0.96); }
+}
+
+@keyframes wisp-a {
+  0%, 100% { transform: translateX(-5%) translateY(0); }
+  25% { transform: translateX(3%) translateY(-5px); }
+  50% { transform: translateX(8%) translateY(3px); }
+  75% { transform: translateX(0%) translateY(-2px); }
+}
+
+@keyframes wisp-b {
+  0%, 100% { transform: translateX(4%) translateY(0); }
+  33% { transform: translateX(-3%) translateY(4px); }
+  66% { transform: translateX(-7%) translateY(-3px); }
+}
+
+@keyframes mist-drift {
+  0%, 100% { transform: translateX(-2%) translateY(0); }
+  33% { transform: translateX(3%) translateY(-4px); }
+  66% { transform: translateX(-1%) translateY(3px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .storm__haze,
+  .storm__puff,
+  .storm__wisp,
+  .storm__mist {
+    animation: none;
+  }
+}

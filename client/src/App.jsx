@@ -4,6 +4,8 @@ import Nav from './components/nav/Nav'
 import Footer from './components/footer/Footer'
 import Home from './pages/home/Home'
 import IntroOverlay from './components/intro/IntroOverlay'
+import ElectricityOverlay from './components/electricity/ElectricityOverlay'
+import StormClouds from './components/electricity/StormClouds'
 import './App.css'
 
 function App() {
@@ -18,6 +20,8 @@ function App() {
           <Route path="/" element={<Home />} />
         </Routes>
       </main>
+      <StormClouds />
+      <ElectricityOverlay />
       <Footer />
     </div>
   )
