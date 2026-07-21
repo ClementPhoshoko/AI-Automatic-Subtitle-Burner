@@ -163,7 +163,7 @@ as $$
   where id = p_job_id and status = 'processing';
 $$;
 
--- Re-queue a failed job (called by worker for retry).
+-- Re-queue a failed or stuck-processing job (called by worker for retry).
 create or replace function public.requeue_job(p_job_id uuid)
 returns void
 language sql
@@ -172,7 +172,7 @@ as $$
   set
     status        = 'queued',
     error_message = null
-  where id = p_job_id and status = 'failed' and retry_count < 3;
+  where id = p_job_id and status in ('failed', 'processing') and retry_count < 3;
 $$;
 
 -- Delete a job and return its video URLs (for storage cleanup).
