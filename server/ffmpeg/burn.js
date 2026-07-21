@@ -7,20 +7,26 @@ const FFMPEG = process.env.FFMPEG_PATH || "ffmpeg";
 function burnSubtitles(videoPath, assPath, outputDir) {
   return new Promise((resolve, reject) => {
     const outputPath = path.join(outputDir, "output.mp4");
+    const assName = path.basename(assPath); // subtitles.ass
 
+    // Use cwd=outputDir so we can reference the ASS file by relative name,
+    // avoiding Windows colon-path issues in filter syntax.
     const args = [
       "-i", videoPath,
-      "-vf", `ass=${assPath}`,
       "-c:v", "libx264",
       "-preset", "fast",
       "-crf", "23",
       "-c:a", "aac",
       "-b:a", "128k",
+      "-vf", `subtitles=${assName}`,
       "-y",
-      outputPath,
+      "output.mp4", // relative — written to cwd
     ];
 
-    const child = execFile(FFMPEG, args, { maxBuffer: 1024 * 1024 * 200 }, (err, stdout, stderr) => {
+    const child = execFile(FFMPEG, args, {
+      cwd: outputDir,
+      maxBuffer: 1024 * 1024 * 200,
+    }, (err, stdout, stderr) => {
       if (err) {
         reject(new Error(`FFmpeg burn failed: ${err.message}`));
         return;
