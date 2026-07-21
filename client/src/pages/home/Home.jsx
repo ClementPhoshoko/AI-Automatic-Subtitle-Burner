@@ -3,15 +3,53 @@ import { FiCpu, FiRefreshCw, FiShield } from 'react-icons/fi'
 import starIcon from '../../assets/Symmetrical_gray_star_icon.png'
 import playIcon from '../../assets/Frosted_UI_play_icon_with_accents.png'
 import HowItWorksSection from '../../components/how-it-works/HowItWorksSection'
+import SlideNotification from '../../components/slide_modal/SlideNotification'
 import './Home.css'
+
+const ALLOWED_TYPES = ['video/mp4', 'video/quicktime', 'video/x-matroska', 'video/webm']
+const ALLOWED_EXT = '.mp4,.mov,.mkv,.webm'
+const MAX_SIZE = 50 * 1024 * 1024
 
 function Home() {
   const inputRef = useRef(null)
   const [dragging, setDragging] = useState(false)
+  const [notif, setNotif] = useState({ show: false, type: 'error', title: '', message: '' })
   const dragCount = useRef(0)
+
+  const showError = (title, message) => {
+    setNotif({ show: true, type: 'error', title, message })
+  }
+
+  const closeNotif = () => setNotif((prev) => ({ ...prev, show: false }))
+
+  const validate = (file) => {
+    if (!ALLOWED_TYPES.includes(file.type)) {
+      showError('Invalid file type', `Supported formats: MP4, MOV, MKV, WebM. Got "${file.name.split('.').pop()}".`)
+      return false
+    }
+    if (file.size > MAX_SIZE) {
+      showError('File too large', `Maximum allowed size is 50 MB. This file is ${(file.size / (1024 * 1024)).toFixed(1)} MB.`)
+      return false
+    }
+    return true
+  }
+
+  const handleFile = useCallback((file) => {
+    if (file && validate(file)) {
+      const dt = new DataTransfer()
+      dt.items.add(file)
+      inputRef.current.files = dt.files
+      inputRef.current.dispatchEvent(new Event('change', { bubbles: true }))
+    }
+  }, [])
 
   const handleClick = () => {
     inputRef.current?.click()
+  }
+
+  const handleChange = (e) => {
+    handleFile(e.target.files?.[0])
+    e.target.value = ''
   }
 
   const handleDragEnter = useCallback((e) => {
@@ -38,13 +76,7 @@ function Home() {
     e.stopPropagation()
     dragCount.current = 0
     setDragging(false)
-    const file = e.dataTransfer.files?.[0]
-    if (file) {
-      const dt = new DataTransfer()
-      dt.items.add(file)
-      inputRef.current.files = dt.files
-      inputRef.current.dispatchEvent(new Event('change', { bubbles: true }))
-    }
+    handleFile(e.dataTransfer.files?.[0])
   }, [])
 
   useEffect(() => {
@@ -107,11 +139,19 @@ function Home() {
           <span className="home-upload-or">or</span>
           <button className="btn btn--md btn--secondary" type="button" onClick={(e) => { e.stopPropagation(); handleClick() }}>Browse Files</button>
           <p className="home-upload-info">Supports MP4, MOV, MKV, WebM (Max 50mb)</p>
-          <input ref={inputRef} type="file" accept=".mp4,.mov,.mkv,.webm" hidden />
+          <input ref={inputRef} type="file" accept={ALLOWED_EXT} onChange={handleChange} hidden />
         </div>
       </div>
 
       <HowItWorksSection />
+
+      <SlideNotification
+        show={notif.show}
+        type={notif.type}
+        title={notif.title}
+        message={notif.message}
+        onClose={closeNotif}
+      />
     </section>
   )
 }
