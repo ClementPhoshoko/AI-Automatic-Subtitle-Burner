@@ -18,8 +18,20 @@ function log(...args) {
 async function downloadFile(url, dest) {
   const response = await fetch(url);
   if (!response.ok) throw new Error(`Download failed: ${response.statusText}`);
-  const buffer = Buffer.from(await response.arrayBuffer());
-  fs.writeFileSync(dest, buffer);
+  const writer = fs.createWriteStream(dest);
+  const reader = response.body.getReader();
+  const pump = async () => {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) { writer.end(); break; }
+      writer.write(value);
+    }
+  };
+  await pump();
+  await new Promise((resolve, reject) => {
+    writer.on("finish", resolve);
+    writer.on("error", reject);
+  });
   return dest;
 }
 
@@ -48,11 +60,11 @@ async function processJob(job) {
 
     log(`[${jobId}] Uploading processed video...`);
     const fileName = `job_${jobId}_processed.mp4`;
-    const fileBuffer = fs.readFileSync(outputPath);
+    const fileStream = fs.createReadStream(outputPath);
 
     const { error: uploadError } = await supabase.storage
       .from("processed")
-      .upload(fileName, fileBuffer, {
+      .upload(fileName, fileStream, {
         contentType: "video/mp4",
         upsert: true,
       });
