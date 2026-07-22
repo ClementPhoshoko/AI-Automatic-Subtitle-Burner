@@ -1,8 +1,10 @@
-import { FiList, FiCpu, FiX } from 'react-icons/fi'
+import { useState } from 'react'
+import { FiList, FiCpu, FiX, FiAlertTriangle, FiArrowLeft } from 'react-icons/fi'
+import ConfirmModal from '../confirm-modal/ConfirmModal'
 import cloudIcon from '../../assets/1_Cloud_upload_icon_with_soft_gradient.png'
 import sparkleIcon from '../../assets/2_Mint_sparkle_icon_on_white_canvas.png'
 import downloadIcon from '../../assets/5_Minimalist_download_icon_with_soft_glow.png'
-import heroImg from '../../assets/Soft tech play icon with cloud.png'
+import heroImg from '../../assets/Pastel_stopwatch_with_whimsical_stars.png'
 import './ProcessingDetails.css'
 
 const DETAILS = [
@@ -29,6 +31,13 @@ const STEPS = [
 ]
 
 function ProcessingDetails({ onCancel }) {
+  const [showConfirm, setShowConfirm] = useState(false)
+
+  const handleCancel = () => {
+    setShowConfirm(false)
+    onCancel?.()
+  }
+
   return (
     <div className="processing-details">
       <div className="processing-details__left">
@@ -46,7 +55,7 @@ function ProcessingDetails({ onCancel }) {
           ))}
         </div>
 
-        <button className="processing-details__cancel" onClick={onCancel}>
+        <button className="processing-details__cancel" onClick={() => setShowConfirm(true)}>
           <FiX size={16} />
           Cancel Processing
         </button>
@@ -80,6 +89,19 @@ function ProcessingDetails({ onCancel }) {
           </div>
         </div>
       </div>
+
+      <ConfirmModal
+        open={showConfirm}
+        message="Are you sure you want to cancel processing?"
+        icon={<FiAlertTriangle />}
+        leftLabel="Go back"
+        rightLabel="Yes, cancel"
+        leftIcon={<FiArrowLeft />}
+        rightIcon={<FiX />}
+        onLeft={() => setShowConfirm(false)}
+        onRight={handleCancel}
+        onClose={() => setShowConfirm(false)}
+      />
     </div>
   )
 }

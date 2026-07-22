@@ -1,5 +1,5 @@
 import { useRef } from 'react'
-import { motion, useScroll, useSpring, useTransform, useMotionValueEvent } from 'framer-motion'
+import { useScroll, useSpring, useTransform, useMotionValueEvent } from 'framer-motion'
 import { Link } from 'react-router-dom'
 import { FiSun } from 'react-icons/fi'
 import { useTheme } from '../../contexts/ThemeContext'
@@ -29,14 +29,7 @@ function Nav() {
   })
 
   return (
-    <motion.nav
-      ref={navRef}
-      className="nav"
-      style={{
-        paddingLeft: useTransform(p, [0, 1], [24, 32]),
-        paddingRight: useTransform(p, [0, 1], [24, 32]),
-      }}
-    >
+    <nav ref={navRef} className="nav">
       <Link to="/" className="nav__left">
         <img className="nav__logo" src={logo} alt="Burner" />
         <span className="nav__title">u r n e r</span>
@@ -46,7 +39,7 @@ function Nav() {
           <FiSun size={18} />
         </button>
       </div>
-    </motion.nav>
+    </nav>
   )
 }
 

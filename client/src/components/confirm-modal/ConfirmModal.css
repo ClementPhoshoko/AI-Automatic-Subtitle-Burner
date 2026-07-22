@@ -1,0 +1,106 @@
+.confirm-modal__overlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4);
+  background: var(--overlay);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+}
+
+.confirm-modal {
+  width: 100%;
+  max-width: 400px;
+  background: var(--glass-bg);
+  border: none;
+  border-radius: var(--radius-2xl);
+  box-shadow: var(--shadow-xl);
+  padding: var(--space-8);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-5);
+  text-align: left;
+}
+
+/* ---- ICON ---- */
+
+.confirm-modal__icon {
+  display: inline-flex;
+  /* align-items: center; */
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  color: var(--text-primary);
+  margin-right: var(--space-3);
+  flex-shrink: 0;
+}
+
+/* ---- MESSAGE ---- */
+
+.confirm-modal__message {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  font-size: var(--font-size-md);
+  color: var(--text-primary);
+  margin: 0;
+  line-height: var(--leading-relaxed);
+  text-align: left;
+}
+
+/* ---- ACTIONS ---- */
+
+.confirm-modal__actions {
+  display: flex;
+  gap: var(--space-3);
+  width: 100%;
+}
+
+.confirm-modal__btn {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  height: var(--button-md);
+  padding: 0 var(--space-5);
+  font-family: var(--font-family);
+  font-size: var(--font-size-sm);
+  font-weight: var(--weight-medium);
+  color: var(--text-primary);
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.confirm-modal__btn:hover {
+  background: var(--surface-2);
+}
+
+.confirm-modal__btn-icon {
+  display: flex;
+  align-items: center;
+  font-size: 16px;
+}
+
+.confirm-modal__btn--right {
+  color: var(--primary);
+}
+
+.confirm-modal__btn--right:hover {
+  background: var(--surface-2);
+}
+
+.confirm-modal__btn--danger {
+  color: var(--danger);
+}
+
+.confirm-modal__btn--danger:hover {
+  background: var(--surface-2);
+}
