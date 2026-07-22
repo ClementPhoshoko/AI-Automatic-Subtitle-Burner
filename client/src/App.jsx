@@ -3,6 +3,7 @@ import { Routes, Route } from 'react-router-dom'
 import Nav from './components/nav/Nav'
 import Footer from './components/footer/Footer'
 import Home from './pages/home/Home'
+import Jobs from './pages/jobs/Jobs'
 import IntroOverlay from './components/intro/IntroOverlay'
 import ElectricityOverlay from './components/electricity/ElectricityOverlay'
 import StormClouds from './components/electricity/StormClouds'
@@ -18,6 +19,7 @@ function App() {
       <main className="app__main">
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/jobs" element={<Jobs />} />
         </Routes>
       </main>
       <StormClouds />
