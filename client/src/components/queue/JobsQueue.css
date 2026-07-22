@@ -134,6 +134,8 @@
 .jobs-queue__item-body {
   flex: 1;
   min-width: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 .jobs-queue__username {
@@ -145,6 +147,12 @@
 .jobs-queue__username--you {
   color: var(--primary);
   font-weight: var(--weight-semibold);
+}
+
+.jobs-queue__time {
+  font-size: 0.625rem;
+  color: var(--text-muted);
+  line-height: var(--leading-tight);
 }
 
 /* ---- ITEM RIGHT ---- */

@@ -3,6 +3,7 @@ import playIcon from '../../assets/Soft tech play icon with cloud.png'
 import starIcon from '../../assets/Symmetrical_gray_star_icon.png'
 import JobProgressCard from '../../components/job-progress-card/JobProgressCard'
 import JobsQueue from '../../components/queue/JobsQueue'
+import ProcessingDetails from '../../components/processing-details/ProcessingDetails'
 import './Jobs.css'
 
 function Jobs() {
@@ -20,13 +21,16 @@ function Jobs() {
     uploadTime: '2 min ago',
   }
 
+  const now = Date.now()
+  const min = (m) => new Date(now - m * 60000).toISOString()
+
   const queueJobs = [
-    { id: 'job-1', userNumber: 8421, status: 'processing', position: 1 },
-    { id: 'job-2', userNumber: 8422, status: 'processing', position: 2 },
-    { id: 'job-3', userNumber: 8423, status: 'queued', position: 3 },
-    { id: 'job-4', userNumber: 8424, status: 'queued', position: 4 },
-    { id: 'job-5', userNumber: 8425, status: 'queued', position: 5 },
-    { id: 'job-20', userNumber: 8440, status: 'queued', position: 20 },
+    { id: 'job-1', userNumber: 8421, status: 'processing', position: 1, createdAt: min(12) },
+    { id: 'job-2', userNumber: 8422, status: 'processing', position: 2, createdAt: min(8) },
+    { id: 'job-3', userNumber: 8423, status: 'queued', position: 3, createdAt: min(5) },
+    { id: 'job-4', userNumber: 8424, status: 'queued', position: 4, createdAt: min(3) },
+    { id: 'job-5', userNumber: 8425, status: 'queued', position: 5, createdAt: min(1) },
+    { id: 'job-20', userNumber: 8440, status: 'queued', position: 20, createdAt: min(0.5) },
   ]
 
   return (
@@ -72,6 +76,8 @@ function Jobs() {
           />
         </div>
       </div>
+
+      <ProcessingDetails />
     </section>
   )
 }

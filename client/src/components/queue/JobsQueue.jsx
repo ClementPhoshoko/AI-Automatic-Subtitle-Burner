@@ -9,6 +9,18 @@ const STATUS_ICONS = {
   failed: FiAlertCircle,
 }
 
+function formatTimeAgo(dateString) {
+  if (!dateString) return ''
+  const seconds = Math.floor((Date.now() - new Date(dateString).getTime()) / 1000)
+  if (seconds < 60) return 'just now'
+  const minutes = Math.floor(seconds / 60)
+  if (minutes < 60) return `${minutes}m ago`
+  const hours = Math.floor(minutes / 60)
+  if (hours < 24) return `${hours}h ago`
+  const days = Math.floor(hours / 24)
+  return `${days}d ago`
+}
+
 function QueueItem({ job, index, isCurrentUser }) {
   const StatusIcon = STATUS_ICONS[job.status] || FiClock
 
@@ -24,6 +36,9 @@ function QueueItem({ job, index, isCurrentUser }) {
         <span className={`jobs-queue__username ${isCurrentUser ? 'jobs-queue__username--you' : ''}`}>
           {isCurrentUser ? 'You' : `Anonymous User #${job.userNumber}`}
         </span>
+        {job.createdAt && (
+          <span className="jobs-queue__time">Added {formatTimeAgo(job.createdAt)}</span>
+        )}
       </div>
 
       <div className="jobs-queue__item-right">
