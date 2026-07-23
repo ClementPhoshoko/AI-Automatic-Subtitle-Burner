@@ -4,6 +4,7 @@ import Nav from './components/nav/Nav'
 import Footer from './components/footer/Footer'
 import Home from './pages/home/Home'
 import Jobs from './pages/jobs/Jobs'
+import NotFound from './pages/not-found/NotFound'
 import IntroOverlay from './components/intro/IntroOverlay'
 import ElectricityOverlay from './components/electricity/ElectricityOverlay'
 import StormClouds from './components/electricity/StormClouds'
@@ -20,6 +21,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/jobs/:jobId" element={<Jobs />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
       <StormClouds />
