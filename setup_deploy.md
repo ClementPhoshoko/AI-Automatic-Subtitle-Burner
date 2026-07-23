@@ -56,9 +56,21 @@ sudo nginx -t && sudo systemctl restart nginx
 sudo certbot --nginx -d burner.akovolabs.co.za
 ```
 
+## 6. Auto-Deploy (GitHub Actions)
+
+Pushes to `main` auto-rebuild the container on your VPS.
+
+Add these secrets in your repo → Settings → Secrets and variables → Actions:
+
+| Secret | Value |
+|---|---|
+| `VPS_HOST` | Your VPS IP address |
+| `VPS_USER` | `root` (or your SSH user) |
+| `VPS_SSH_KEY` | Private SSH key content |
+
 ---
 
-## Updating After Code Changes
+## Updating Manually (if needed)
 
 ```bash
 cd /var/www/subtitle-burner
