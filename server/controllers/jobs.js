@@ -21,7 +21,7 @@ async function uploadVideo(req, res) {
     }
 
     const remoteName = sanitizeFilename(req.file.originalname);
-    const fileBuffer = fs.readFileSync(req.file.path);
+    const fileBuffer = await fs.promises.readFile(req.file.path);
 
     const { data: uploadData, error: uploadError } = await supabase.storage
       .from(BUCKET_UPLOADS)
@@ -29,8 +29,6 @@ async function uploadVideo(req, res) {
         contentType: req.file.mimetype,
         upsert: false,
       });
-
-    fs.unlinkSync(req.file.path);
 
     if (uploadError) {
       logger.error("Supabase upload error:", uploadError);
@@ -76,7 +74,7 @@ async function uploadVideo(req, res) {
 
         const thumbPath = await generateThumbnail(localPath, path.dirname(localPath));
         const thumbFileName = `thumb_${jobRow.id}.jpg`;
-        const thumbBuffer = fs.readFileSync(thumbPath);
+        const thumbBuffer = await fs.promises.readFile(thumbPath);
 
         let thumbnailUrl = null;
         const { error: thumbUploadError } = await supabase.storage
@@ -93,15 +91,18 @@ async function uploadVideo(req, res) {
           thumbnailUrl = thumbUrlData.publicUrl;
         }
 
-        await supabase
-          .from("jobs")
-          .update({
-            duration_seconds: metadata.duration,
-            resolution: metadata.resolution,
-            file_size: metadata.fileSize,
-            thumbnail_url: thumbnailUrl,
-          })
-          .eq("id", jobRow.id);
+        const metaUpdate = {};
+        if (metadata.duration !== null) metaUpdate.duration_seconds = metadata.duration;
+        if (metadata.resolution !== null) metaUpdate.resolution = metadata.resolution;
+        if (metadata.fileSize !== null) metaUpdate.file_size = metadata.fileSize;
+        if (thumbnailUrl !== null) metaUpdate.thumbnail_url = thumbnailUrl;
+
+        if (Object.keys(metaUpdate).length > 0) {
+          await supabase
+            .from("jobs")
+            .update(metaUpdate)
+            .eq("id", jobRow.id);
+        }
       } catch (metaErr) {
         logger.error("Post-upload metadata extraction failed", { error: metaErr.message });
       } finally {
