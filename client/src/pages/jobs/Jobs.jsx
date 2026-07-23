@@ -1,14 +1,14 @@
 import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { FiCpu, FiAlertCircle, FiArrowLeft, FiCheckCircle, FiClock } from 'react-icons/fi'
+import { FiCpu, FiArrowLeft, FiCheckCircle } from 'react-icons/fi'
 import playIcon from '../../assets/Soft tech play icon with cloud.png'
 import completeIcon from '../../assets/Soft_UI_icon_with_cloud_and_sparkle.png'
 import starIcon from '../../assets/Symmetrical_gray_star_icon.png'
+import notFoundImg from '../../assets/Confused by a broken screen.png'
 import JobProgressCard from '../../components/job-progress-card/JobProgressCard'
 import JobsQueue from '../../components/queue/JobsQueue'
 import ProcessingDetails from '../../components/processing-details/ProcessingDetails'
-import SlideNotification from '../../components/slide_modal/SlideNotification'
 import { useJobProgress } from '../../hooks/useJobProgress'
 import { useQueue } from '../../hooks/useQueue'
 import { deleteJob } from '../../api/jobs'
@@ -21,7 +21,6 @@ function Jobs() {
   const navigate = useNavigate()
   const { job, loading, error } = useJobProgress(jobId)
   const { jobs: queueJobs, estimatedWait, loading: queueLoading } = useQueue(jobId)
-  const [notifDismissed, setNotifDismissed] = useState(false)
 
   const isComplete = job?.status === 'completed'
   const isValidUuid = UUID_RE.test(jobId)
@@ -73,35 +72,30 @@ function Jobs() {
   if (error) {
     return (
       <section className="jobs">
-        {isExpired && (
-          <SlideNotification
-            show={!notifDismissed}
-            type="warning"
-            title="Video expired"
-            message="This video was automatically removed after 2 hours."
-            onClose={() => setNotifDismissed(true)}
-            autoClose={false}
+        <motion.div
+          className="jobs-not-found"
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+        >
+          <img
+            className="jobs-not-found__image"
+            src={notFoundImg}
+            alt=""
           />
-        )}
-        <div className="jobs-error">
-          {isExpired ? (
-            <FiClock className="jobs-error__icon jobs-error__icon--expired" />
-          ) : (
-            <FiAlertCircle className="jobs-error__icon" />
-          )}
-          <h3 className="jobs-error__title">
-            {isExpired ? 'Video expired' : error.title || 'Something went wrong'}
+          <h3 className="jobs-not-found__title">
+            {isExpired ? 'This job was deleted' : 'Job not found'}
           </h3>
-          <p className="jobs-error__text">
+          <p className="jobs-not-found__desc">
             {isExpired
-              ? 'This video was automatically deleted after 2 hours. Files are temporary to keep our system fast.'
-              : error.message || 'Could not load this job. Please try again.'}
+              ? 'This video was automatically removed after 2 hours. Files are temporary to keep our system fast.'
+              : 'The job you\'re looking for doesn\'t exist or has been removed. Please try uploading again.'}
           </p>
-          <button className="jobs-error__back" onClick={() => navigate('/')}>
+          <button className="jobs-not-found__btn" onClick={() => navigate('/')}>
             <FiArrowLeft size={16} />
             Back to Home
           </button>
-        </div>
+        </motion.div>
       </section>
     )
   }
@@ -109,15 +103,26 @@ function Jobs() {
   if (!job) {
     return (
       <section className="jobs">
-        <div className="jobs-error">
-          <FiAlertCircle className="jobs-error__icon" />
-          <h3 className="jobs-error__title">Job not found</h3>
-          <p className="jobs-error__text">This job does not exist or has been removed.</p>
-          <button className="jobs-error__back" onClick={() => navigate('/')}>
+        <motion.div
+          className="jobs-not-found"
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+        >
+          <img
+            className="jobs-not-found__image"
+            src={notFoundImg}
+            alt=""
+          />
+          <h3 className="jobs-not-found__title">Job not found</h3>
+          <p className="jobs-not-found__desc">
+            This job does not exist or has been removed.
+          </p>
+          <button className="jobs-not-found__btn" onClick={() => navigate('/')}>
             <FiArrowLeft size={16} />
             Back to Home
           </button>
-        </div>
+        </motion.div>
       </section>
     )
   }

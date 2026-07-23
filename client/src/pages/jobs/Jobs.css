@@ -225,3 +225,58 @@
   border-color: var(--primary);
   color: var(--primary);
 }
+
+/* ---- NOT FOUND ---- */
+
+.jobs-not-found {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 500px;
+  gap: var(--space-4);
+  text-align: center;
+  padding: var(--space-10) var(--space-6);
+}
+
+.jobs-not-found__image {
+  width: 100%;
+  max-width: 360px;
+  height: auto;
+}
+
+.jobs-not-found__title {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-2xl);
+  font-weight: var(--weight-bold);
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.jobs-not-found__desc {
+  font-size: var(--font-size-md);
+  color: var(--text-secondary);
+  margin: 0;
+  max-width: 400px;
+  line-height: var(--leading-relaxed);
+}
+
+.jobs-not-found__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+  padding: 0;
+  background: transparent;
+  color: var(--text-secondary);
+  border: none;
+  font-family: var(--font-family);
+  font-size: var(--font-size-sm);
+  font-weight: var(--weight-medium);
+  cursor: pointer;
+  transition: color var(--transition-fast);
+}
+
+.jobs-not-found__btn:hover {
+  color: var(--text-primary);
+}

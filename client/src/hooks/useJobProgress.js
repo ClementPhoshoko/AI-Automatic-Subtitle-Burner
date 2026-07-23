@@ -77,6 +77,7 @@ export function useJobProgress(id) {
         setError({
           title: err.title || 'Something went wrong',
           message: err.message || 'Could not load this job.',
+          raw: err.raw,
         })
         stopPolling()
       } finally {
