@@ -9,6 +9,7 @@ import JobsQueue from '../../components/queue/JobsQueue'
 import ProcessingDetails from '../../components/processing-details/ProcessingDetails'
 import { useJobProgress } from '../../hooks/useJobProgress'
 import { useQueue } from '../../hooks/useQueue'
+import { deleteJob } from '../../api/jobs'
 import './Jobs.css'
 
 function Jobs() {
@@ -18,6 +19,13 @@ function Jobs() {
   const { jobs: queueJobs, estimatedWait, loading: queueLoading } = useQueue(jobId)
 
   const isComplete = job?.status === 'completed'
+
+  const handleCancel = async () => {
+    try {
+      await deleteJob(jobId)
+    } catch {}
+    navigate('/')
+  }
 
   if (loading) {
     return (
@@ -213,7 +221,7 @@ function Jobs() {
         </AnimatePresence>
       </div>
 
-      <ProcessingDetails job={job} status={job.status} loading={loading} />
+      <ProcessingDetails job={job} status={job.status} loading={loading} onCancel={handleCancel} />
     </section>
   )
 }

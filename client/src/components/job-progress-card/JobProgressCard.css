@@ -251,6 +251,19 @@
   filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
 }
 
+.job-progress-card__thumbnail-wrap--playing {
+  background: #000;
+}
+
+.job-progress-card__video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  border-radius: var(--radius-xl);
+  outline: none;
+}
+
 /* STATS ROW */
 
 .job-progress-card__stats {
@@ -380,6 +393,15 @@
   background: var(--surface-2);
   border-color: var(--text-muted);
   color: var(--text-primary);
+}
+
+/* EXPIRATION NOTICE */
+
+.job-progress-card__expiry {
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+  margin-top: var(--space-3);
+  line-height: var(--leading-tight);
 }
 
 /* ---- SKELETON ---- */

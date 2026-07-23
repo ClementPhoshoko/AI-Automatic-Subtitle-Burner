@@ -14,7 +14,7 @@ const STYLES = {
     Outline: 2,
     Shadow: 1,
     Alignment: 2,
-    MarginV: 40,
+    MarginV: 48,
   },
   tiktok: {
     Fontname: "Arial",
@@ -28,7 +28,7 @@ const STYLES = {
     Outline: 4,
     Shadow: 0,
     Alignment: 2,
-    MarginV: 30,
+    MarginV: 36,
   },
   minimal: {
     Fontname: "Segoe UI",
@@ -42,7 +42,7 @@ const STYLES = {
     Outline: 1,
     Shadow: 0,
     Alignment: 2,
-    MarginV: 20,
+    MarginV: 24,
   },
   cinema: {
     Fontname: "Georgia",
@@ -56,7 +56,7 @@ const STYLES = {
     Outline: 2,
     Shadow: 2,
     Alignment: 2,
-    MarginV: 50,
+    MarginV: 60,
   },
   apple: {
     Fontname: "Helvetica Neue",
@@ -70,7 +70,7 @@ const STYLES = {
     Outline: 1,
     Shadow: 1,
     Alignment: 2,
-    MarginV: 40,
+    MarginV: 48,
   },
   netflix: {
     Fontname: "Arial",
@@ -84,7 +84,7 @@ const STYLES = {
     Outline: 0,
     Shadow: 2,
     Alignment: 2,
-    MarginV: 45,
+    MarginV: 54,
   },
   youtube: {
     Fontname: "Arial",
@@ -98,7 +98,7 @@ const STYLES = {
     Outline: 0,
     Shadow: 0,
     Alignment: 2,
-    MarginV: 60,
+    MarginV: 72,
   },
 };
 

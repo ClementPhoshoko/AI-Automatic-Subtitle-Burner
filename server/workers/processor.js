@@ -67,10 +67,10 @@ async function processJob(job) {
       const thumbnailPath = await generateThumbnail(videoPath, tmpDir);
 
       const thumbFileName = `thumb_${jobId}.jpg`;
-      const thumbStream = fs.createReadStream(thumbnailPath);
+      const thumbBuffer = fs.readFileSync(thumbnailPath);
       const { error: thumbUploadError } = await supabase.storage
         .from("thumbnails")
-        .upload(thumbFileName, thumbStream, {
+        .upload(thumbFileName, thumbBuffer, {
           contentType: "image/jpeg",
           upsert: true,
         });
@@ -113,11 +113,11 @@ async function processJob(job) {
 
     logger.info(`[${jobId}] Uploading processed video...`);
     const fileName = `job_${jobId}_processed.mp4`;
-    const fileStream = fs.createReadStream(outputPath);
+    const fileBuffer = fs.readFileSync(outputPath);
 
     const { error: uploadError } = await supabase.storage
       .from("processed")
-      .upload(fileName, fileStream, {
+      .upload(fileName, fileBuffer, {
         contentType: "video/mp4",
         upsert: true,
       });
@@ -149,7 +149,30 @@ async function processJob(job) {
       p_error_message: err.message,
     });
 
-    if (failError) logger.error(`[${jobId}] Failed to update error status`, { error: failError.message });
+    if (failError) {
+      logger.error(`[${jobId}] Failed to update error status`, { error: failError.message });
+      return;
+    }
+
+    const { data: jobRow } = await supabase
+      .from("jobs")
+      .select("retry_count")
+      .eq("id", jobId)
+      .single();
+
+    const attempts = jobRow?.retry_count || 0;
+
+    if (attempts < 3) {
+      logger.warn(`[${jobId}] Retrying (attempt ${attempts}/3)...`);
+      const { error: requeueError } = await supabase.rpc("requeue_job", {
+        p_job_id: jobId,
+      });
+      if (requeueError) {
+        logger.error(`[${jobId}] Failed to requeue`, { error: requeueError.message });
+      }
+    } else {
+      logger.error(`[${jobId}] Terminated after ${attempts} failed attempts`);
+    }
   } finally {
     fs.rmSync(tmpDir, { recursive: true, force: true });
     activeJobs.delete(jobId);

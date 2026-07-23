@@ -1,3 +1,4 @@
+import { useState, useRef } from 'react'
 import { motion } from 'framer-motion'
 import { FiClock, FiAlertCircle, FiVideo, FiCheckCircle, FiGlobe, FiFileText, FiDownload, FiShare2, FiMoreHorizontal, FiPlay } from 'react-icons/fi'
 import { downloadSubtitles, getSubtitlesUrl } from '../../api/jobs'
@@ -102,6 +103,21 @@ function JobProgressCard({
 
   const isComplete = status === 'completed'
   const isFailed = status === 'failed'
+  const [hasStarted, setHasStarted] = useState(false)
+  const [playing, setPlaying] = useState(false)
+  const videoRef = useRef(null)
+
+  const handlePlayClick = () => {
+    setHasStarted(true)
+    setPlaying(true)
+    requestAnimationFrame(() => {
+      videoRef.current?.play()
+    })
+  }
+
+  const handleVideoPlay = () => setPlaying(true)
+  const handleVideoPause = () => setPlaying(false)
+  const handleVideoEnded = () => setPlaying(false)
 
   // ---- COMPLETED STATE ----
   if (isComplete) {
@@ -114,16 +130,37 @@ function JobProgressCard({
       >
         <div className="job-progress-card__main">
           {/* VIDEO PLAYER (same size as thumbnail) */}
-          <motion.div className="job-progress-card__thumbnail-wrap" variants={fadeUp}>
-            {thumbnail ? (
-              <img className="job-progress-card__thumbnail" src={thumbnail} alt="" />
+          <motion.div className={`job-progress-card__thumbnail-wrap ${hasStarted ? 'job-progress-card__thumbnail-wrap--playing' : ''}`} variants={fadeUp}>
+            {!hasStarted ? (
+              <>
+                {thumbnail ? (
+                  <img className="job-progress-card__thumbnail" src={thumbnail} alt="" />
+                ) : (
+                  <div className="job-progress-card__thumbnail" />
+                )}
+                <span className="job-progress-card__duration">{duration}</span>
+                <div className="job-progress-card__player-overlay" onClick={handlePlayClick}>
+                  <FiPlay className="job-progress-card__player-play" />
+                </div>
+              </>
             ) : (
-              <div className="job-progress-card__thumbnail" />
+              <>
+                <video
+                  ref={videoRef}
+                  className="job-progress-card__video"
+                  src={outputVideoUrl}
+                  controls
+                  onPlay={handleVideoPlay}
+                  onPause={handleVideoPause}
+                  onEnded={handleVideoEnded}
+                />
+                {!playing && (
+                  <div className="job-progress-card__player-overlay" onClick={() => videoRef.current?.play()}>
+                    <FiPlay className="job-progress-card__player-play" />
+                  </div>
+                )}
+              </>
             )}
-            <span className="job-progress-card__duration">{duration}</span>
-            <div className="job-progress-card__player-overlay">
-              <FiPlay className="job-progress-card__player-play" />
-            </div>
           </motion.div>
 
           <div className="job-progress-card__info">
@@ -215,6 +252,11 @@ function JobProgressCard({
                 </motion.button>
               </div>
             </motion.div>
+
+            {/* EXPIRATION NOTICE */}
+            <motion.p className="job-progress-card__expiry" variants={fadeUp}>
+              Files expire in 2 hours. Download now to keep them.
+            </motion.p>
           </div>
         </div>
 

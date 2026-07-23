@@ -57,24 +57,31 @@ async function uploadVideo(req, res) {
 
     const jobRow = Array.isArray(job) ? job[0] : job;
 
-    await supabase
+    const { error: filenameError } = await supabase
       .from("jobs")
       .update({ original_filename: req.file.originalname })
       .eq("id", jobRow.id);
 
+    if (filenameError) {
+      logger.error("Failed to set original_filename", { id: jobRow.id, error: filenameError.message });
+    }
+
+    jobRow.original_filename = req.file.originalname;
+
+    const localPath = req.file.path;
+
     (async () => {
       try {
-        const localPath = req.file.path;
         const metadata = await getVideoMetadata(localPath);
 
         const thumbPath = await generateThumbnail(localPath, path.dirname(localPath));
         const thumbFileName = `thumb_${jobRow.id}.jpg`;
-        const thumbStream = fs.createReadStream(thumbPath);
+        const thumbBuffer = fs.readFileSync(thumbPath);
 
         let thumbnailUrl = null;
         const { error: thumbUploadError } = await supabase.storage
           .from("thumbnails")
-          .upload(thumbFileName, thumbStream, {
+          .upload(thumbFileName, thumbBuffer, {
             contentType: "image/jpeg",
             upsert: true,
           });
@@ -89,7 +96,6 @@ async function uploadVideo(req, res) {
         await supabase
           .from("jobs")
           .update({
-            original_filename: req.file.originalname,
             duration_seconds: metadata.duration,
             resolution: metadata.resolution,
             file_size: metadata.fileSize,
@@ -98,6 +104,8 @@ async function uploadVideo(req, res) {
           .eq("id", jobRow.id);
       } catch (metaErr) {
         logger.error("Post-upload metadata extraction failed", { error: metaErr.message });
+      } finally {
+        if (fs.existsSync(localPath)) fs.unlinkSync(localPath);
       }
     })();
 
