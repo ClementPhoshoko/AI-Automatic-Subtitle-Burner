@@ -28,6 +28,17 @@ app.get("/api/health", (req, res) => {
   res.json({ status: "ok", timestamp: new Date().toISOString() });
 });
 
+/* ─── Static frontend (production) ─── */
+
+const clientDist = path.join(__dirname, "..", "client", "dist");
+if (fs.existsSync(clientDist)) {
+  app.use(express.static(clientDist));
+  app.get("*", (req, res, next) => {
+    if (req.path.startsWith("/api")) return next();
+    res.sendFile(path.join(clientDist, "index.html"));
+  });
+}
+
 /* ─── Error handler ─── */
 
 app.use((err, req, res, next) => {

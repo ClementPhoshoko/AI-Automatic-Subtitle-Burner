@@ -1,0 +1,16 @@
+node_modules
+client/node_modules
+client/dist
+server/node_modules
+.git
+.github
+*.md
+!README.md
+*.png
+.env
+.env.*
+!.env.example
+.cache
+.nyc_output
+coverage
+.vscode
