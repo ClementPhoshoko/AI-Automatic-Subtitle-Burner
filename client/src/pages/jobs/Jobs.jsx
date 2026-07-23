@@ -1,24 +1,31 @@
+import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { FiCpu, FiAlertCircle, FiArrowLeft, FiCheckCircle } from 'react-icons/fi'
+import { FiCpu, FiAlertCircle, FiArrowLeft, FiCheckCircle, FiClock } from 'react-icons/fi'
 import playIcon from '../../assets/Soft tech play icon with cloud.png'
 import completeIcon from '../../assets/Soft_UI_icon_with_cloud_and_sparkle.png'
 import starIcon from '../../assets/Symmetrical_gray_star_icon.png'
 import JobProgressCard from '../../components/job-progress-card/JobProgressCard'
 import JobsQueue from '../../components/queue/JobsQueue'
 import ProcessingDetails from '../../components/processing-details/ProcessingDetails'
+import SlideNotification from '../../components/slide_modal/SlideNotification'
 import { useJobProgress } from '../../hooks/useJobProgress'
 import { useQueue } from '../../hooks/useQueue'
 import { deleteJob } from '../../api/jobs'
 import './Jobs.css'
+
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
 function Jobs() {
   const { jobId } = useParams()
   const navigate = useNavigate()
   const { job, loading, error } = useJobProgress(jobId)
   const { jobs: queueJobs, estimatedWait, loading: queueLoading } = useQueue(jobId)
+  const [notifDismissed, setNotifDismissed] = useState(false)
 
   const isComplete = job?.status === 'completed'
+  const isValidUuid = UUID_RE.test(jobId)
+  const isExpired = isValidUuid && error?.raw === 'Job not found'
 
   const handleCancel = async () => {
     try {
@@ -66,10 +73,30 @@ function Jobs() {
   if (error) {
     return (
       <section className="jobs">
+        {isExpired && (
+          <SlideNotification
+            show={!notifDismissed}
+            type="warning"
+            title="Video expired"
+            message="This video was automatically removed after 2 hours."
+            onClose={() => setNotifDismissed(true)}
+            autoClose={false}
+          />
+        )}
         <div className="jobs-error">
-          <FiAlertCircle className="jobs-error__icon" />
-          <h3 className="jobs-error__title">{error.title || 'Something went wrong'}</h3>
-          <p className="jobs-error__text">{error.message || 'Could not load this job. Please try again.'}</p>
+          {isExpired ? (
+            <FiClock className="jobs-error__icon jobs-error__icon--expired" />
+          ) : (
+            <FiAlertCircle className="jobs-error__icon" />
+          )}
+          <h3 className="jobs-error__title">
+            {isExpired ? 'Video expired' : error.title || 'Something went wrong'}
+          </h3>
+          <p className="jobs-error__text">
+            {isExpired
+              ? 'This video was automatically deleted after 2 hours. Files are temporary to keep our system fast.'
+              : error.message || 'Could not load this job. Please try again.'}
+          </p>
           <button className="jobs-error__back" onClick={() => navigate('/')}>
             <FiArrowLeft size={16} />
             Back to Home

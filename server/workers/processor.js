@@ -67,7 +67,7 @@ async function processJob(job) {
       const thumbnailPath = await generateThumbnail(videoPath, tmpDir);
 
       const thumbFileName = `thumb_${jobId}.jpg`;
-      const thumbBuffer = fs.readFileSync(thumbnailPath);
+      const thumbBuffer = await fs.promises.readFile(thumbnailPath);
       const { error: thumbUploadError } = await supabase.storage
         .from("thumbnails")
         .upload(thumbFileName, thumbBuffer, {
@@ -116,7 +116,7 @@ async function processJob(job) {
 
     logger.info(`[${jobId}] Uploading processed video...`);
     const fileName = `job_${jobId}_processed.mp4`;
-    const fileBuffer = fs.readFileSync(outputPath);
+    const fileBuffer = await fs.promises.readFile(outputPath);
 
     const { error: uploadError } = await supabase.storage
       .from("processed")

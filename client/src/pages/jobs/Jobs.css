@@ -184,6 +184,10 @@
   margin-bottom: var(--space-2);
 }
 
+.jobs-error__icon--expired {
+  color: var(--warning, #f59e0b);
+}
+
 .jobs-error__title {
   font-size: var(--font-size-lg);
   font-weight: var(--weight-semibold);
