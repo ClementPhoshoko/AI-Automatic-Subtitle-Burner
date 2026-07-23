@@ -36,6 +36,10 @@
   color: var(--primary);
 }
 
+.processing-details__header-icon--completed {
+  color: var(--success);
+}
+
 .processing-details__title {
   font-size: var(--font-size-lg);
   font-weight: var(--weight-semibold);
@@ -126,18 +130,6 @@
   box-shadow: 0 4px 16px rgba(99, 102, 241, 0.35);
 }
 
-/* ---- COMPLETED HEADER ICON ---- */
-
-.processing-details__header-icon--completed {
-  color: var(--success);
-}
-
-/* ---- COMPLETED STEP ---- */
-
-.processing-details__step--done {
-  opacity: 0.6;
-}
-
 /* ---- RIGHT COLUMN ---- */
 
 .processing-details__right {
@@ -208,6 +200,10 @@
   display: flex;
   align-items: center;
   gap: var(--space-3);
+}
+
+.processing-details__step--done {
+  opacity: 0.6;
 }
 
 .processing-details__step-icon {

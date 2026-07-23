@@ -59,18 +59,7 @@ const COMING_SOON = [
   },
 ]
 
-const stagger = {
-  hidden: { opacity: 0 },
-  show: {
-    opacity: 1,
-    transition: { staggerChildren: 0.05, delayChildren: 0.1 },
-  },
-}
-
-const fadeUp = {
-  hidden: { opacity: 0, y: 10 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.3, ease: [0.16, 1, 0.3, 1] } },
-}
+const cardTransition = { duration: 0.4, ease: [0.4, 0, 0.2, 1] }
 
 function ProcessingDetails({ status = 'processing', onCancel }) {
   const [showConfirm, setShowConfirm] = useState(false)
@@ -81,8 +70,6 @@ function ProcessingDetails({ status = 'processing', onCancel }) {
     onCancel?.()
   }
 
-  const details = isComplete ? COMPLETED_DETAILS : PROCESSING_DETAILS
-
   return (
     <div className="processing-details">
       <AnimatePresence mode="wait">
@@ -90,9 +77,9 @@ function ProcessingDetails({ status = 'processing', onCancel }) {
           <motion.div
             key="processing"
             className="processing-details__left"
-            initial={{ opacity: 1 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.25 }}
+            initial={{ opacity: 1, filter: 'blur(0px)' }}
+            exit={{ opacity: 0, filter: 'blur(6px)', y: -8 }}
+            transition={cardTransition}
           >
             <div className="processing-details__header">
               <FiList className="processing-details__header-icon" />
@@ -100,7 +87,7 @@ function ProcessingDetails({ status = 'processing', onCancel }) {
             </div>
 
             <div className="processing-details__list">
-              {details.map((item) => (
+              {PROCESSING_DETAILS.map((item) => (
                 <div key={item.label} className="processing-details__row">
                   <span className="processing-details__label">{item.label}</span>
                   <span className="processing-details__value">{item.value}</span>
@@ -117,23 +104,23 @@ function ProcessingDetails({ status = 'processing', onCancel }) {
           <motion.div
             key="completed"
             className="processing-details__left"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+            initial={{ opacity: 0, filter: 'blur(6px)', y: 8 }}
+            animate={{ opacity: 1, filter: 'blur(0px)', y: 0 }}
+            transition={cardTransition}
           >
             <div className="processing-details__header">
               <FiCheckCircle className="processing-details__header-icon processing-details__header-icon--completed" />
               <h3 className="processing-details__title">Completed Details</h3>
             </div>
 
-            <motion.div className="processing-details__list" variants={stagger} initial="hidden" animate="show">
-              {details.map((item) => (
-                <motion.div key={item.label} className="processing-details__row" variants={fadeUp}>
+            <div className="processing-details__list">
+              {COMPLETED_DETAILS.map((item) => (
+                <div key={item.label} className="processing-details__row">
                   <span className="processing-details__label">{item.label}</span>
                   <span className="processing-details__value">{item.value}</span>
-                </motion.div>
+                </div>
               ))}
-            </motion.div>
+            </div>
 
             <motion.button
               className="processing-details__new-video"
@@ -147,38 +134,69 @@ function ProcessingDetails({ status = 'processing', onCancel }) {
         )}
       </AnimatePresence>
 
-      <div className="processing-details__right">
-        <div className="processing-details__wait-header">
-          <FiCpu className="processing-details__wait-icon" />
-          <h3 className="processing-details__wait-title">
-            {isComplete ? 'Coming Soon' : 'While you wait'}
-          </h3>
-        </div>
+      <AnimatePresence mode="wait">
+        {!isComplete ? (
+          <motion.div
+            key="wait"
+            className="processing-details__right"
+            initial={{ opacity: 1, filter: 'blur(0px)' }}
+            exit={{ opacity: 0, filter: 'blur(6px)', y: -8 }}
+            transition={cardTransition}
+          >
+            <div className="processing-details__wait-header">
+              <FiCpu className="processing-details__wait-icon" />
+              <h3 className="processing-details__wait-title">While you wait</h3>
+            </div>
+            <p className="processing-details__wait-subtitle">Great things take a little time.</p>
+            <p className="processing-details__wait-desc">Here's what's happening:</p>
 
-        <p className="processing-details__wait-subtitle">
-          {isComplete
-            ? 'After hearing from our customers, we\'re working on features that will make your experience even better.'
-            : 'Great things take a little time.'}
-        </p>
-        <p className="processing-details__wait-desc">
-          {isComplete ? 'Here\'s what\'s coming:' : 'Here\'s what\'s happening:'}
-        </p>
-
-        <div className="processing-details__steps">
-          <div className="processing-details__steps-list">
-            {(isComplete ? COMING_SOON : STEPS).map((step, i) => (
-              <div key={i} className={`processing-details__step ${isComplete ? 'processing-details__step--done' : ''}`}>
-                <img className="processing-details__step-icon" src={step.icon} alt="" />
-                <span className="processing-details__step-text">{step.text}</span>
+            <div className="processing-details__steps">
+              <div className="processing-details__steps-list">
+                {STEPS.map((step, i) => (
+                  <div key={i} className="processing-details__step">
+                    <img className="processing-details__step-icon" src={step.icon} alt="" />
+                    <span className="processing-details__step-text">{step.text}</span>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
+              <div className="processing-details__steps-image">
+                <img className="processing-details__hero-img" src={heroImg} alt="" />
+              </div>
+            </div>
+          </motion.div>
+        ) : (
+          <motion.div
+            key="coming"
+            className="processing-details__right"
+            initial={{ opacity: 0, filter: 'blur(6px)', y: 8 }}
+            animate={{ opacity: 1, filter: 'blur(0px)', y: 0 }}
+            transition={cardTransition}
+          >
+            <div className="processing-details__wait-header">
+              <FiCpu className="processing-details__wait-icon" />
+              <h3 className="processing-details__wait-title">Coming Soon</h3>
+            </div>
+            <p className="processing-details__wait-subtitle">
+              After hearing from our customers, we're working on features that will make your experience even better.
+            </p>
+            <p className="processing-details__wait-desc">Here's what's coming:</p>
 
-          <div className="processing-details__steps-image">
-            <img className="processing-details__hero-img" src={heroImg} alt="" />
-          </div>
-        </div>
-      </div>
+            <div className="processing-details__steps">
+              <div className="processing-details__steps-list">
+                {COMING_SOON.map((step, i) => (
+                  <div key={i} className="processing-details__step processing-details__step--done">
+                    <img className="processing-details__step-icon" src={step.icon} alt="" />
+                    <span className="processing-details__step-text">{step.text}</span>
+                  </div>
+                ))}
+              </div>
+              <div className="processing-details__steps-image">
+                <img className="processing-details__hero-img" src={heroImg} alt="" />
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <ConfirmModal
         open={showConfirm}
