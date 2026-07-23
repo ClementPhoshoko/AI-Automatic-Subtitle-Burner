@@ -229,3 +229,37 @@ create trigger trg_jobs_set_completed_at
   for each row
   when (new.status = 'completed')
   execute function public.set_completed_at();
+
+-- ==========================================================================
+-- MIGRATION: Add metadata columns and storage buckets
+-- Run this in the Supabase SQL Editor after the base schema.
+-- ==========================================================================
+
+-- 1. Add new columns to jobs table
+ALTER TABLE public.jobs
+  ADD COLUMN IF NOT EXISTS original_filename text,
+  ADD COLUMN IF NOT EXISTS file_size bigint,
+  ADD COLUMN IF NOT EXISTS duration_seconds numeric,
+  ADD COLUMN IF NOT EXISTS resolution text,
+  ADD COLUMN IF NOT EXISTS thumbnail_url text;
+
+-- 2. Ensure all storage buckets exist
+INSERT INTO storage.buckets (id, name, public)
+VALUES
+  ('uploads',    'uploads',    true),
+  ('processed',  'processed',  true),
+  ('thumbnails', 'thumbnails', true)
+ON CONFLICT (id) DO NOTHING;
+
+-- 3. Thumbnails bucket policy
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies WHERE policyname = 'Public access — thumbnails'
+  ) THEN
+    CREATE POLICY "Public access — thumbnails"
+      ON storage.objects FOR ALL
+      USING (bucket_id = 'thumbnails')
+      WITH CHECK (bucket_id = 'thumbnails');
+  END IF;
+END $$;

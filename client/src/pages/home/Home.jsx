@@ -45,10 +45,24 @@ function Home() {
     setUploading(true)
     setProgress(0)
 
+    let current = 0
+    const interval = setInterval(() => {
+      const remaining = 95 - current
+      const step = Math.max(1, Math.ceil(remaining * 0.08))
+      current = Math.min(current + step, 95)
+      setProgress(current)
+    }, 200)
+
     try {
-      const job = await uploadVideo(file, 'classic', (p) => setProgress(p))
+      const job = await uploadVideo(file, 'classic')
+
+      clearInterval(interval)
+      setProgress(100)
+
+      await new Promise((r) => setTimeout(r, 600))
       navigate(`/jobs/${job.id}`)
     } catch (err) {
+      clearInterval(interval)
       showError(err.title || 'Upload failed', err.message || 'Something went wrong. Please try again.')
       setUploading(false)
       setProgress(0)

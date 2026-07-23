@@ -52,27 +52,37 @@ async function processJob(job) {
     const videoPath = path.join(tmpDir, "input.mp4");
     await downloadFile(job.original_video_url, videoPath);
 
-    logger.info(`[${jobId}] Extracting metadata...`);
-    const metadata = await getVideoMetadata(videoPath);
-
-    logger.info(`[${jobId}] Generating thumbnail...`);
-    const thumbnailPath = await generateThumbnail(videoPath, tmpDir);
-
-    const thumbFileName = `thumb_${jobId}.jpg`;
-    const thumbStream = fs.createReadStream(thumbnailPath);
-    const { error: thumbUploadError } = await supabase.storage
-      .from("thumbnails")
-      .upload(thumbFileName, thumbStream, {
-        contentType: "image/jpeg",
-        upsert: true,
-      });
-
+    let metadata = { duration: null, resolution: null, fileSize: null };
     let thumbnailUrl = null;
-    if (!thumbUploadError) {
-      const { data: thumbUrlData } = supabase.storage
+
+    try {
+      logger.info(`[${jobId}] Extracting metadata...`);
+      metadata = await getVideoMetadata(videoPath);
+    } catch (metaErr) {
+      logger.warn(`[${jobId}] Metadata extraction failed (non-blocking)`, { error: metaErr.message });
+    }
+
+    try {
+      logger.info(`[${jobId}] Generating thumbnail...`);
+      const thumbnailPath = await generateThumbnail(videoPath, tmpDir);
+
+      const thumbFileName = `thumb_${jobId}.jpg`;
+      const thumbStream = fs.createReadStream(thumbnailPath);
+      const { error: thumbUploadError } = await supabase.storage
         .from("thumbnails")
-        .getPublicUrl(thumbFileName);
-      thumbnailUrl = thumbUrlData.publicUrl;
+        .upload(thumbFileName, thumbStream, {
+          contentType: "image/jpeg",
+          upsert: true,
+        });
+
+      if (!thumbUploadError) {
+        const { data: thumbUrlData } = supabase.storage
+          .from("thumbnails")
+          .getPublicUrl(thumbFileName);
+        thumbnailUrl = thumbUrlData.publicUrl;
+      }
+    } catch (thumbErr) {
+      logger.warn(`[${jobId}] Thumbnail generation failed (non-blocking)`, { error: thumbErr.message });
     }
 
     const { error: metaError } = await supabase
@@ -112,7 +122,10 @@ async function processJob(job) {
         upsert: true,
       });
 
-    if (uploadError) throw new Error(`Storage upload failed: ${uploadError.message}`);
+    if (uploadError) {
+      logger.error(`[${jobId}] Storage upload error`, { code: uploadError.code, message: uploadError.message });
+      throw new Error(`Storage upload failed: ${uploadError.message}`);
+    }
 
     const { data: publicUrlData } = supabase.storage
       .from("processed")
