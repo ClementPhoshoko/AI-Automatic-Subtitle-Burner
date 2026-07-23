@@ -7,7 +7,9 @@ const {
   getJob,
   processJob,
   deleteJob,
+  getQueue,
 } = require("../controllers/jobs");
+const subtitlesRouter = require("./subtitles");
 
 const router = Router();
 
@@ -72,6 +74,18 @@ router.get("/", listJobs);
 
 /**
  * @openapi
+ * /api/jobs/queue:
+ *   get:
+ *     tags: [Jobs]
+ *     summary: Get queue status and pending jobs
+ *     responses:
+ *       200:
+ *         description: Queue details with processing/queued counts
+ */
+router.get("/queue", getQueue);
+
+/**
+ * @openapi
  * /api/jobs/{id}:
  *   get:
  *     tags: [Jobs]
@@ -128,5 +142,24 @@ router.post("/:id/process", processJob);
  *         description: Job not found
  */
 router.delete("/:id", deleteJob);
+
+/**
+ * @openapi
+ * /api/jobs/{id}/subtitles:
+ *   get:
+ *     tags: [Subtitles]
+ *     summary: Download subtitles as .srt file
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string, format: uuid }
+ *     responses:
+ *       200:
+ *         description: SRT subtitle file
+ *       404:
+ *         description: Job not found or no subtitles
+ */
+router.use("/:id/subtitles", subtitlesRouter);
 
 module.exports = router;

@@ -3,6 +3,8 @@ const path = require("path");
 const os = require("os");
 const supabase = require("../services/supabase");
 const { extractAudio } = require("../ffmpeg/extract");
+const { getVideoMetadata } = require("../ffmpeg/metadata");
+const { generateThumbnail } = require("../ffmpeg/thumbnail");
 const { transcribeAudio } = require("../services/gemini");
 const { generateAss } = require("../services/subtitle");
 const { burnSubtitles } = require("../ffmpeg/burn");
@@ -49,6 +51,43 @@ async function processJob(job) {
     logger.info(`[${jobId}] Downloading video...`);
     const videoPath = path.join(tmpDir, "input.mp4");
     await downloadFile(job.original_video_url, videoPath);
+
+    logger.info(`[${jobId}] Extracting metadata...`);
+    const metadata = await getVideoMetadata(videoPath);
+
+    logger.info(`[${jobId}] Generating thumbnail...`);
+    const thumbnailPath = await generateThumbnail(videoPath, tmpDir);
+
+    const thumbFileName = `thumb_${jobId}.jpg`;
+    const thumbStream = fs.createReadStream(thumbnailPath);
+    const { error: thumbUploadError } = await supabase.storage
+      .from("thumbnails")
+      .upload(thumbFileName, thumbStream, {
+        contentType: "image/jpeg",
+        upsert: true,
+      });
+
+    let thumbnailUrl = null;
+    if (!thumbUploadError) {
+      const { data: thumbUrlData } = supabase.storage
+        .from("thumbnails")
+        .getPublicUrl(thumbFileName);
+      thumbnailUrl = thumbUrlData.publicUrl;
+    }
+
+    const { error: metaError } = await supabase
+      .from("jobs")
+      .update({
+        duration_seconds: metadata.duration,
+        resolution: metadata.resolution,
+        file_size: metadata.fileSize,
+        thumbnail_url: thumbnailUrl,
+      })
+      .eq("id", jobId);
+
+    if (metaError) {
+      logger.error(`[${jobId}] Failed to store metadata`, { error: metaError.message });
+    }
 
     logger.info(`[${jobId}] Extracting audio...`);
     const audioPath = await extractAudio(videoPath, tmpDir);
@@ -107,7 +146,6 @@ async function processJob(job) {
 /* ─── Atomically claim and process a queued job ─── */
 
 async function claimAndProcess() {
-  // Claim the oldest queued job using a single RPC that returns the claimed row
   const { data: job, error } = await supabase
     .from("jobs")
     .update({ status: "processing" })
@@ -118,7 +156,7 @@ async function claimAndProcess() {
     .single();
 
   if (error) {
-    if (error.code === "PGRST116") return; // no rows matched — normal
+    if (error.code === "PGRST116") return;
     logger.error("[Worker] Claim error", { error: error.message });
     return;
   }
@@ -137,8 +175,6 @@ async function poll() {
   const slots = MAX_CONCURRENCY - activeJobs.size;
   if (slots <= 0) return;
 
-  // Claim up to `slots` jobs, one per poll cycle
-  // (DB UPDATE returns at most 1 row per call, so we loop)
   for (let i = 0; i < slots; i++) {
     await claimAndProcess();
   }
@@ -169,7 +205,6 @@ async function requeueStaleJobs() {
       p_job_id: job.id,
     });
     if (reqErr) {
-      // If requeue fails (e.g. retry_count >= 3), leave it as failed
       logger.error("Failed to re-queue stale job", { job: job.id, error: reqErr.message });
     }
   }
@@ -180,13 +215,10 @@ async function requeueStaleJobs() {
 function start() {
   logger.info("Worker started", { concurrency: MAX_CONCURRENCY, pollInterval: POLL_INTERVAL_MS / 1000 });
 
-  // Recover stale jobs on startup
   requeueStaleJobs();
 
-  // Periodic stale sweep
   setInterval(requeueStaleJobs, STALE_SWEEP_MS);
 
-  // Start polling
   poll();
   setInterval(poll, POLL_INTERVAL_MS);
 }

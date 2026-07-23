@@ -3,6 +3,8 @@ const path = require("path");
 const supabase = require("../services/supabase");
 const logger = require("../utils/logger");
 const { sanitizeFilename, SUBTITLE_STYLES } = require("../utils/helpers");
+const { getVideoMetadata } = require("../ffmpeg/metadata");
+const { generateThumbnail } = require("../ffmpeg/thumbnail");
 
 const BUCKET_UPLOADS = "uploads";
 
@@ -54,6 +56,45 @@ async function uploadVideo(req, res) {
     }
 
     const jobRow = Array.isArray(job) ? job[0] : job;
+
+    (async () => {
+      try {
+        const localPath = req.file.path;
+        const metadata = await getVideoMetadata(localPath);
+
+        const thumbPath = await generateThumbnail(localPath, path.dirname(localPath));
+        const thumbFileName = `thumb_${jobRow.id}.jpg`;
+        const thumbStream = fs.createReadStream(thumbPath);
+
+        let thumbnailUrl = null;
+        const { error: thumbUploadError } = await supabase.storage
+          .from("thumbnails")
+          .upload(thumbFileName, thumbStream, {
+            contentType: "image/jpeg",
+            upsert: true,
+          });
+
+        if (!thumbUploadError) {
+          const { data: thumbUrlData } = supabase.storage
+            .from("thumbnails")
+            .getPublicUrl(thumbFileName);
+          thumbnailUrl = thumbUrlData.publicUrl;
+        }
+
+        await supabase
+          .from("jobs")
+          .update({
+            original_filename: req.file.originalname,
+            duration_seconds: metadata.duration,
+            resolution: metadata.resolution,
+            file_size: metadata.fileSize,
+            thumbnail_url: thumbnailUrl,
+          })
+          .eq("id", jobRow.id);
+      } catch (metaErr) {
+        logger.error("Post-upload metadata extraction failed", { error: metaErr.message });
+      }
+    })();
 
     res.status(201).json(jobRow);
   } catch (err) {
@@ -197,4 +238,32 @@ async function deleteJob(req, res) {
   }
 }
 
-module.exports = { uploadVideo, listJobs, getJob, processJob, deleteJob };
+async function getQueue(req, res) {
+  try {
+    const { data, error } = await supabase
+      .from("jobs")
+      .select("id, status, created_at, original_filename")
+      .in("status", ["queued", "processing"])
+      .order("created_at", { ascending: true });
+
+    if (error) {
+      logger.error("Get queue error:", error);
+      return res.status(500).json({ error: "Failed to fetch queue" });
+    }
+
+    const processing = data.filter((j) => j.status === "processing");
+    const queued = data.filter((j) => j.status === "queued");
+
+    res.json({
+      total: data.length,
+      processing: processing.length,
+      queued: queued.length,
+      jobs: data,
+    });
+  } catch (err) {
+    logger.error("Get queue error:", err);
+    res.status(500).json({ error: err.message || "Internal server error" });
+  }
+}
+
+module.exports = { uploadVideo, listJobs, getJob, processJob, deleteJob, getQueue };
