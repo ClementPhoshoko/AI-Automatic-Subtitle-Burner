@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { getFriendlyError } from '../utils/errors'
 
 const api = axios.create({
   baseURL: 'http://localhost:3001/api',
@@ -8,8 +9,12 @@ const api = axios.create({
 api.interceptors.response.use(
   (res) => res,
   (err) => {
-    const message = err.response?.data?.error || err.message || 'Network error'
-    return Promise.reject(new Error(message))
+    const raw = err.response?.data?.error || err.message || 'Network error'
+    const friendly = getFriendlyError(raw)
+    const error = new Error(friendly.message)
+    error.title = friendly.title
+    error.raw = raw
+    return Promise.reject(error)
   }
 )
 

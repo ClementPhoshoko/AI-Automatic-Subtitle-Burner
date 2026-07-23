@@ -1,9 +1,11 @@
 import { useRef, useState, useEffect, useCallback } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { FiCpu, FiRefreshCw, FiShield } from 'react-icons/fi'
 import starIcon from '../../assets/Symmetrical_gray_star_icon.png'
 import playIcon from '../../assets/Frosted_UI_play_icon_with_accents.png'
 import HowItWorksSection from '../../components/how-it-works/HowItWorksSection'
 import SlideNotification from '../../components/slide_modal/SlideNotification'
+import { uploadVideo } from '../../api/jobs'
 import './Home.css'
 
 const ALLOWED_TYPES = ['video/mp4', 'video/quicktime', 'video/x-matroska', 'video/webm']
@@ -11,9 +13,12 @@ const ALLOWED_EXT = '.mp4,.mov,.mkv,.webm'
 const MAX_SIZE = 50 * 1024 * 1024
 
 function Home() {
+  const navigate = useNavigate()
   const inputRef = useRef(null)
   const [dragging, setDragging] = useState(false)
   const [notif, setNotif] = useState({ show: false, type: 'error', title: '', message: '' })
+  const [uploading, setUploading] = useState(false)
+  const [progress, setProgress] = useState(0)
   const dragCount = useRef(0)
 
   const showError = (title, message) => {
@@ -34,16 +39,28 @@ function Home() {
     return true
   }
 
-  const handleFile = useCallback((file) => {
-    if (file && validate(file)) {
-      const dt = new DataTransfer()
-      dt.items.add(file)
-      inputRef.current.files = dt.files
-      inputRef.current.dispatchEvent(new Event('change', { bubbles: true }))
+  const startUpload = useCallback(async (file) => {
+    if (!validate(file)) return
+
+    setUploading(true)
+    setProgress(0)
+
+    try {
+      const job = await uploadVideo(file, 'classic', (p) => setProgress(p))
+      navigate(`/jobs/${job.id}`)
+    } catch (err) {
+      showError(err.title || 'Upload failed', err.message || 'Something went wrong. Please try again.')
+      setUploading(false)
+      setProgress(0)
     }
-  }, [])
+  }, [navigate])
+
+  const handleFile = useCallback((file) => {
+    if (file) startUpload(file)
+  }, [startUpload])
 
   const handleClick = () => {
+    if (uploading) return
     inputRef.current?.click()
   }
 
@@ -76,8 +93,8 @@ function Home() {
     e.stopPropagation()
     dragCount.current = 0
     setDragging(false)
-    handleFile(e.dataTransfer.files?.[0])
-  }, [])
+    if (!uploading) handleFile(e.dataTransfer.files?.[0])
+  }, [handleFile, uploading])
 
   useEffect(() => {
     const el = window
@@ -133,14 +150,36 @@ function Home() {
       </div>
 
       <div className="home-upload glass-card">
-        <div className="home-upload-zone" onClick={handleClick} role="button" tabIndex={0}>
+        <div
+          className={`home-upload-zone ${uploading ? 'home-upload-zone--uploading' : ''}`}
+          onClick={handleClick}
+          role="button"
+          tabIndex={0}
+        >
           <img className="home-upload-icon" src={playIcon} alt="" />
-          <p className="home-upload-prompt">Drag & drop your video here</p>
-          <span className="home-upload-or">or</span>
-          <button className="btn btn--md btn--secondary" type="button" onClick={(e) => { e.stopPropagation(); handleClick() }}>Browse Files</button>
+          <p className="home-upload-prompt">
+            {uploading ? 'Uploading...' : 'Drag & drop your video here'}
+          </p>
+          {!uploading && (
+            <>
+              <span className="home-upload-or">or</span>
+              <button className="btn btn--md btn--secondary" type="button" onClick={(e) => { e.stopPropagation(); handleClick() }}>Browse Files</button>
+            </>
+          )}
           <p className="home-upload-info">Supports MP4, MOV, MKV, WebM (Max 50mb)</p>
           <input ref={inputRef} type="file" accept={ALLOWED_EXT} onChange={handleChange} hidden />
         </div>
+        {uploading && (
+          <div className="home-upload-progress">
+            <div className="home-upload-progress__track">
+              <div
+                className="home-upload-progress__bar"
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+            <span className="home-upload-progress__label">{progress}%</span>
+          </div>
+        )}
       </div>
 
       <HowItWorksSection />

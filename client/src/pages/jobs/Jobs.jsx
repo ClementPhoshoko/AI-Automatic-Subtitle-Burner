@@ -1,53 +1,64 @@
-import { useState } from 'react'
+import { useParams, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { FiCpu } from 'react-icons/fi'
+import { FiCpu, FiAlertCircle, FiArrowLeft } from 'react-icons/fi'
 import playIcon from '../../assets/Soft tech play icon with cloud.png'
 import starIcon from '../../assets/Symmetrical_gray_star_icon.png'
 import JobProgressCard from '../../components/job-progress-card/JobProgressCard'
 import JobsQueue from '../../components/queue/JobsQueue'
 import ProcessingDetails from '../../components/processing-details/ProcessingDetails'
+import { useJobProgress } from '../../hooks/useJobProgress'
+import { useQueue } from '../../hooks/useQueue'
 import './Jobs.css'
 
 function Jobs() {
-  const [status, setStatus] = useState('processing')
-  const [progress, setProgress] = useState(68)
+  const { jobId } = useParams()
+  const navigate = useNavigate()
+  const { job, loading, error } = useJobProgress(jobId)
+  const { jobs: queueJobs, estimatedWait } = useQueue(jobId)
 
-  const job = {
-    thumbnail: 'https://picsum.photos/seed/video1/640/360',
-    title: 'My awesome travel montage 2026.mp4',
-    format: 'MP4',
-    resolution: '1920×1080',
-    fileSize: '245 MB',
-    duration: '12:34',
-    status,
-    progress,
-    estimatedTime: '2 minutes remaining',
-    workflowStage: 2,
-    uploadTime: '2 min ago',
+  const isComplete = job?.status === 'completed'
+
+  if (loading) {
+    return (
+      <section className="jobs">
+        <div className="jobs-loading">
+          <div className="jobs-loading__spinner" />
+          <p className="jobs-loading__text">Loading job...</p>
+        </div>
+      </section>
+    )
   }
 
-  const now = Date.now()
-  const min = (m) => new Date(now - m * 60000).toISOString()
+  if (error) {
+    return (
+      <section className="jobs">
+        <div className="jobs-error">
+          <FiAlertCircle className="jobs-error__icon" />
+          <h3 className="jobs-error__title">{error.title || 'Something went wrong'}</h3>
+          <p className="jobs-error__text">{error.message || 'Could not load this job. Please try again.'}</p>
+          <button className="jobs-error__back" onClick={() => navigate('/')}>
+            <FiArrowLeft size={16} />
+            Back to Home
+          </button>
+        </div>
+      </section>
+    )
+  }
 
-  const queueJobs = [
-    { id: 'job-1', userNumber: 8421, status: 'processing', position: 1, createdAt: min(12) },
-    { id: 'job-2', userNumber: 8422, status: 'processing', position: 2, createdAt: min(8) },
-    { id: 'job-3', userNumber: 8423, status: 'queued', position: 3, createdAt: min(5) },
-    { id: 'job-4', userNumber: 8424, status: 'queued', position: 4, createdAt: min(3) },
-    { id: 'job-5', userNumber: 8425, status: 'queued', position: 5, createdAt: min(1) },
-    { id: 'job-20', userNumber: 8440, status: 'queued', position: 20, createdAt: min(0.5) },
-  ]
-
-  const isComplete = status === 'completed' || progress >= 100
-
-  const handleToggle = () => {
-    if (isComplete) {
-      setStatus('processing')
-      setProgress(68)
-    } else {
-      setStatus('completed')
-      setProgress(100)
-    }
+  if (!job) {
+    return (
+      <section className="jobs">
+        <div className="jobs-error">
+          <FiAlertCircle className="jobs-error__icon" />
+          <h3 className="jobs-error__title">Job not found</h3>
+          <p className="jobs-error__text">This job does not exist or has been removed.</p>
+          <button className="jobs-error__back" onClick={() => navigate('/')}>
+            <FiArrowLeft size={16} />
+            Back to Home
+          </button>
+        </div>
+      </section>
+    )
   }
 
   return (
@@ -98,8 +109,8 @@ function Jobs() {
               <div className="jobs-layout__sidebar">
                 <JobsQueue
                   jobs={queueJobs}
-                  estimatedWait="~3 minutes"
-                  currentUserId="job-20"
+                  estimatedWait={estimatedWait}
+                  currentUserId={jobId}
                 />
               </div>
             </motion.div>
@@ -131,16 +142,7 @@ function Jobs() {
         </AnimatePresence>
       </div>
 
-      <ProcessingDetails status={status} />
-
-      <motion.button
-        className="jobs-toggle-btn"
-        onClick={handleToggle}
-        whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.98 }}
-      >
-        {isComplete ? 'Back to Processing' : 'Complete Job'}
-      </motion.button>
+      <ProcessingDetails job={job} status={job.status} />
     </section>
   )
 }

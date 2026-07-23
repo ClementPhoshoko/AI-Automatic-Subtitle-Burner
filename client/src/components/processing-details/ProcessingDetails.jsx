@@ -1,29 +1,14 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { FiList, FiCpu, FiX, FiAlertTriangle, FiArrowLeft, FiCheckCircle, FiPlus } from 'react-icons/fi'
 import ConfirmModal from '../confirm-modal/ConfirmModal'
+import { formatAbsoluteTime } from '../../utils/format'
 import cloudIcon from '../../assets/1_Cloud_upload_icon_with_soft_gradient.png'
 import sparkleIcon from '../../assets/2_Mint_sparkle_icon_on_white_canvas.png'
 import downloadIcon from '../../assets/5_Minimalist_download_icon_with_soft_glow.png'
 import heroImg from '../../assets/Pastel_stopwatch_with_whimsical_stars.png'
 import './ProcessingDetails.css'
-
-const PROCESSING_DETAILS = [
-  { label: 'AI Model', value: 'Google Gemini' },
-  { label: 'Language', value: 'English (Default)' },
-  { label: 'Audio Length', value: '02:45' },
-  { label: 'File Size', value: '245.6 MB' },
-  { label: 'Created At', value: 'May 18, 2024 . 10:21 AM' },
-]
-
-const COMPLETED_DETAILS = [
-  { label: 'AI Model', value: 'Google Gemini' },
-  { label: 'Language', value: 'English (Default)' },
-  { label: 'Audio Length', value: '02:45' },
-  { label: 'File Size', value: '245.6 MB' },
-  { label: 'Created At', value: 'May 18, 2024 . 10:21 AM' },
-  { label: 'Completed At', value: 'May 18, 2024 . 10:27 AM' },
-]
 
 const STEPS = [
   {
@@ -61,13 +46,30 @@ const COMING_SOON = [
 
 const cardTransition = { duration: 0.4, ease: [0.4, 0, 0.2, 1] }
 
-function ProcessingDetails({ status = 'processing', onCancel }) {
+function ProcessingDetails({ job, status = 'processing', onCancel }) {
+  const navigate = useNavigate()
   const [showConfirm, setShowConfirm] = useState(false)
   const isComplete = status === 'completed'
+
+  const details = [
+    { label: 'AI Model', value: 'Google Gemini' },
+    { label: 'Language', value: job?.language || 'English (Default)' },
+    { label: 'Audio Length', value: job?.duration || '—' },
+    { label: 'File Size', value: job?.fileSize || '—' },
+    { label: 'Created At', value: formatAbsoluteTime(job?.createdAt) },
+  ]
+
+  if (isComplete) {
+    details.push({ label: 'Completed At', value: formatAbsoluteTime(job?.completedAt) })
+  }
 
   const handleCancel = () => {
     setShowConfirm(false)
     onCancel?.()
+  }
+
+  const handleNewVideo = () => {
+    navigate('/')
   }
 
   return (
@@ -87,7 +89,7 @@ function ProcessingDetails({ status = 'processing', onCancel }) {
             </div>
 
             <div className="processing-details__list">
-              {PROCESSING_DETAILS.map((item) => (
+              {details.map((item) => (
                 <div key={item.label} className="processing-details__row">
                   <span className="processing-details__label">{item.label}</span>
                   <span className="processing-details__value">{item.value}</span>
@@ -114,7 +116,7 @@ function ProcessingDetails({ status = 'processing', onCancel }) {
             </div>
 
             <div className="processing-details__list">
-              {COMPLETED_DETAILS.map((item) => (
+              {details.map((item) => (
                 <div key={item.label} className="processing-details__row">
                   <span className="processing-details__label">{item.label}</span>
                   <span className="processing-details__value">{item.value}</span>
@@ -124,6 +126,7 @@ function ProcessingDetails({ status = 'processing', onCancel }) {
 
             <motion.button
               className="processing-details__new-video"
+              onClick={handleNewVideo}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
             >

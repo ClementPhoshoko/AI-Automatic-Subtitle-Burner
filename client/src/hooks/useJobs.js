@@ -14,7 +14,7 @@ export function useJobs({ status, limit = 50, offset = 0, autoRefresh = false, i
       setTotal(data.total || 0)
       setError(null)
     } catch (err) {
-      setError(err.message)
+      setError({ title: err.title, message: err.message })
     } finally {
       setLoading(false)
     }
@@ -31,7 +31,7 @@ export function useJobs({ status, limit = 50, offset = 0, autoRefresh = false, i
         setError(null)
       } catch (err) {
         if (!active) return
-        setError(err.message)
+        setError({ title: err.title, message: err.message })
       } finally {
         if (active) setLoading(false)
       }
@@ -67,7 +67,7 @@ export function useJob(id) {
       setJob(data)
       setError(null)
     } catch (err) {
-      setError(err.message)
+      setError({ title: err.title, message: err.message })
     } finally {
       setLoading(false)
     }
@@ -84,7 +84,7 @@ export function useJob(id) {
         setError(null)
       } catch (err) {
         if (!active) return
-        setError(err.message)
+        setError({ title: err.title, message: err.message })
       } finally {
         if (active) setLoading(false)
       }

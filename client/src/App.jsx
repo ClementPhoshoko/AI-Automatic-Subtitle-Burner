@@ -19,7 +19,7 @@ function App() {
       <main className="app__main">
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/jobs" element={<Jobs />} />
+          <Route path="/jobs/:jobId" element={<Jobs />} />
         </Routes>
       </main>
       <StormClouds />

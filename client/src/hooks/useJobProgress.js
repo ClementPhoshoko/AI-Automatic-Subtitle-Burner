@@ -74,7 +74,10 @@ export function useJobProgress(id) {
         await doPoll()
       } catch (err) {
         if (!active) return
-        setError(err.message)
+        setError({
+          title: err.title || 'Something went wrong',
+          message: err.message || 'Could not load this job.',
+        })
         stopPolling()
       } finally {
         if (active) setLoading(false)
