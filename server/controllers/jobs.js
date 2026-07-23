@@ -57,6 +57,11 @@ async function uploadVideo(req, res) {
 
     const jobRow = Array.isArray(job) ? job[0] : job;
 
+    await supabase
+      .from("jobs")
+      .update({ original_filename: req.file.originalname })
+      .eq("id", jobRow.id);
+
     (async () => {
       try {
         const localPath = req.file.path;

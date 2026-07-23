@@ -52,7 +52,7 @@ function QueueItem({ job, index, isCurrentUser }) {
   )
 }
 
-function JobsQueue({ jobs = [], estimatedWait = '—', currentUserId = null }) {
+function JobsQueue({ jobs = [], estimatedWait = '—', currentUserId = null, loading = false }) {
   const currentUserJob = jobs.find(j => j.id === currentUserId)
   const currentUserIndex = jobs.findIndex(j => j.id === currentUserId)
 
@@ -71,34 +71,60 @@ function JobsQueue({ jobs = [], estimatedWait = '—', currentUserId = null }) {
       </div>
 
       <div className="jobs-queue__list">
-        {topItems.map((job, index) => (
-          <QueueItem
-            key={job.id}
-            job={job}
-            index={index}
-            isCurrentUser={job.id === currentUserId}
-          />
-        ))}
-
-        {showEllipsis && currentUserJob && (
+        {loading ? (
           <>
-            <div className="jobs-queue__ellipsis">
-              <FiMoreVertical className="jobs-queue__ellipsis-icon" />
-              <FiMoreVertical className="jobs-queue__ellipsis-icon" />
-              <FiMoreVertical className="jobs-queue__ellipsis-icon" />
-            </div>
-            <QueueItem
-              job={currentUserJob}
-              index={currentUserIndex}
-              isCurrentUser
-            />
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="jobs-queue__item jobs-queue__item--skeleton">
+                <div className="jobs-queue__item-left">
+                  <div className="jobs-queue__skeleton-circle" />
+                </div>
+                <div className="jobs-queue__item-body">
+                  <div className="jobs-queue__skeleton-text jobs-queue__skeleton-text--name" />
+                  <div className="jobs-queue__skeleton-text jobs-queue__skeleton-text--time" />
+                </div>
+                <div className="jobs-queue__item-right">
+                  <div className="jobs-queue__skeleton-text jobs-queue__skeleton-text--status" />
+                  <div className="jobs-queue__skeleton-text jobs-queue__skeleton-text--position" />
+                </div>
+              </div>
+            ))}
+          </>
+        ) : (
+          <>
+            {topItems.map((job, index) => (
+              <QueueItem
+                key={job.id}
+                job={job}
+                index={index}
+                isCurrentUser={job.id === currentUserId}
+              />
+            ))}
+
+            {showEllipsis && currentUserJob && (
+              <>
+                <div className="jobs-queue__ellipsis">
+                  <FiMoreVertical className="jobs-queue__ellipsis-icon" />
+                  <FiMoreVertical className="jobs-queue__ellipsis-icon" />
+                  <FiMoreVertical className="jobs-queue__ellipsis-icon" />
+                </div>
+                <QueueItem
+                  job={currentUserJob}
+                  index={currentUserIndex}
+                  isCurrentUser
+                />
+              </>
+            )}
           </>
         )}
       </div>
 
       <div className="jobs-queue__footer">
         <span className="jobs-queue__footer-label">Estimated time:</span>
-        <span className="jobs-queue__footer-value">{estimatedWait}</span>
+        {loading ? (
+          <span className="jobs-queue__skeleton-text jobs-queue__skeleton-text--value" />
+        ) : (
+          <span className="jobs-queue__footer-value">{estimatedWait}</span>
+        )}
       </div>
     </div>
   )

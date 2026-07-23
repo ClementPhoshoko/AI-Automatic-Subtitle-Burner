@@ -1,7 +1,8 @@
 import { useParams, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { FiCpu, FiAlertCircle, FiArrowLeft } from 'react-icons/fi'
+import { FiCpu, FiAlertCircle, FiArrowLeft, FiCheckCircle } from 'react-icons/fi'
 import playIcon from '../../assets/Soft tech play icon with cloud.png'
+import completeIcon from '../../assets/Soft_UI_icon_with_cloud_and_sparkle.png'
 import starIcon from '../../assets/Symmetrical_gray_star_icon.png'
 import JobProgressCard from '../../components/job-progress-card/JobProgressCard'
 import JobsQueue from '../../components/queue/JobsQueue'
@@ -14,17 +15,42 @@ function Jobs() {
   const { jobId } = useParams()
   const navigate = useNavigate()
   const { job, loading, error } = useJobProgress(jobId)
-  const { jobs: queueJobs, estimatedWait } = useQueue(jobId)
+  const { jobs: queueJobs, estimatedWait, loading: queueLoading } = useQueue(jobId)
 
   const isComplete = job?.status === 'completed'
 
   if (loading) {
     return (
       <section className="jobs">
-        <div className="jobs-loading">
-          <div className="jobs-loading__spinner" />
-          <p className="jobs-loading__text">Loading job...</p>
+        <div className="jobs-hero">
+          <div className="jobs-hero__left">
+            <h1 className="jobs-hero__title">
+              <FiCpu className="jobs-hero__ai-icon" size={28} />
+              Your video is<br />
+              Being{' '}<span className="jobs-hero__accent">processed</span>
+              <img className="jobs-hero__star-icon" src={starIcon} alt="" />.
+            </h1>
+            <p className="jobs-hero__desc">
+              Sit back and relax! We're generating accurate subtitles for your video using Google Gemini.
+            </p>
+          </div>
+          <div className="jobs-hero__right">
+            <img className="jobs-hero__img" src={playIcon} alt="" />
+          </div>
         </div>
+
+        <div className="jobs-content">
+          <div className="jobs-layout">
+            <div className="jobs-layout__main">
+              <JobProgressCard loading />
+            </div>
+            <div className="jobs-layout__sidebar">
+              <JobsQueue loading />
+            </div>
+          </div>
+        </div>
+
+        <ProcessingDetails loading />
       </section>
     )
   }
@@ -64,19 +90,61 @@ function Jobs() {
   return (
     <section className="jobs">
       <div className="jobs-hero">
-        <div className="jobs-hero__left">
-          <h1 className="jobs-hero__title">
-            <FiCpu className="jobs-hero__ai-icon" size={28} />
-            Your video is<br />
-            Being{' '}<span className="jobs-hero__accent">processed</span>
-            <img className="jobs-hero__star-icon" src={starIcon} alt="" />.
-          </h1>
-          <p className="jobs-hero__desc">
-            Sit back and relax! We're generating accurate subtitles for your video using Google Gemini.
-          </p>
-        </div>
+        <AnimatePresence mode="wait">
+          {!isComplete ? (
+            <motion.div
+              key="processing-hero"
+              className="jobs-hero__left"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <h1 className="jobs-hero__title">
+                <FiCpu className="jobs-hero__ai-icon" size={28} />
+                Your video is<br />
+                Being{' '}<span className="jobs-hero__accent">processed</span>
+                <img className="jobs-hero__star-icon" src={starIcon} alt="" />.
+              </h1>
+              <p className="jobs-hero__desc">
+                Sit back and relax! We're generating accurate subtitles for your video using Google Gemini.
+              </p>
+            </motion.div>
+          ) : (
+            <motion.div
+              key="completed-hero"
+              className="jobs-hero__left"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <h1 className="jobs-hero__title">
+                <FiCheckCircle className="jobs-hero__ai-icon jobs-hero__ai-icon--complete" size={28} />
+                Your video is<br />
+                ready to <span className="jobs-hero__accent">download!</span>
+                <img className="jobs-hero__star-icon" src={starIcon} alt="" />.
+              </h1>
+              <p className="jobs-hero__desc">
+                We've generated accurate subtitles for your video using Google Gemini. You can preview, download, and share it now.
+              </p>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         <div className="jobs-hero__right">
-          <img className="jobs-hero__img" src={playIcon} alt="" />
+          <AnimatePresence mode="wait">
+            <motion.img
+              key={isComplete ? 'complete-icon' : 'play-icon'}
+              className="jobs-hero__img"
+              src={isComplete ? completeIcon : playIcon}
+              alt=""
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+            />
+          </AnimatePresence>
         </div>
       </div>
 
@@ -111,6 +179,7 @@ function Jobs() {
                   jobs={queueJobs}
                   estimatedWait={estimatedWait}
                   currentUserId={jobId}
+                  loading={queueLoading}
                 />
               </div>
             </motion.div>
@@ -124,6 +193,7 @@ function Jobs() {
             >
               <div className="jobs-layout__main jobs-layout__main--full">
                 <JobProgressCard
+                  jobId={job.id}
                   thumbnail={job.thumbnail}
                   title={job.title}
                   format={job.format}
@@ -135,6 +205,7 @@ function Jobs() {
                   estimatedTime={job.estimatedTime}
                   workflowStage={job.workflowStage}
                   uploadTime={job.uploadTime}
+                  outputVideoUrl={job.outputVideoUrl}
                 />
               </div>
             </motion.div>
@@ -142,7 +213,7 @@ function Jobs() {
         </AnimatePresence>
       </div>
 
-      <ProcessingDetails job={job} status={job.status} />
+      <ProcessingDetails job={job} status={job.status} loading={loading} />
     </section>
   )
 }

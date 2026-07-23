@@ -46,7 +46,7 @@ const COMING_SOON = [
 
 const cardTransition = { duration: 0.4, ease: [0.4, 0, 0.2, 1] }
 
-function ProcessingDetails({ job, status = 'processing', onCancel }) {
+function ProcessingDetails({ job, status = 'processing', onCancel, loading = false }) {
   const navigate = useNavigate()
   const [showConfirm, setShowConfirm] = useState(false)
   const isComplete = status === 'completed'
@@ -84,23 +84,46 @@ function ProcessingDetails({ job, status = 'processing', onCancel }) {
             transition={cardTransition}
           >
             <div className="processing-details__header">
-              <FiList className="processing-details__header-icon" />
-              <h3 className="processing-details__title">Processing Details</h3>
+              {loading ? (
+                <div className="processing-details__skeleton-text processing-details__skeleton-text--icon" />
+              ) : (
+                <FiList className="processing-details__header-icon" />
+              )}
+              <div className="processing-details__title-wrap">
+                {loading ? (
+                  <div className="processing-details__skeleton-text processing-details__skeleton-text--title" />
+                ) : (
+                  <h3 className="processing-details__title">Processing Details</h3>
+                )}
+              </div>
             </div>
 
             <div className="processing-details__list">
-              {details.map((item) => (
-                <div key={item.label} className="processing-details__row">
-                  <span className="processing-details__label">{item.label}</span>
-                  <span className="processing-details__value">{item.value}</span>
-                </div>
-              ))}
+              {loading ? (
+                <>
+                  {[1, 2, 3, 4, 5].map((i) => (
+                    <div key={i} className="processing-details__row">
+                      <div className="processing-details__skeleton-text processing-details__skeleton-text--label" />
+                      <div className="processing-details__skeleton-text processing-details__skeleton-text--value" />
+                    </div>
+                  ))}
+                </>
+              ) : (
+                details.map((item) => (
+                  <div key={item.label} className="processing-details__row">
+                    <span className="processing-details__label">{item.label}</span>
+                    <span className="processing-details__value">{item.value}</span>
+                  </div>
+                ))
+              )}
             </div>
 
-            <button className="processing-details__cancel" onClick={() => setShowConfirm(true)}>
-              <FiX size={16} />
-              Cancel Processing
-            </button>
+            {!loading && (
+              <button className="processing-details__cancel" onClick={() => setShowConfirm(true)}>
+                <FiX size={16} />
+                Cancel Processing
+              </button>
+            )}
           </motion.div>
         ) : (
           <motion.div
@@ -138,7 +161,37 @@ function ProcessingDetails({ job, status = 'processing', onCancel }) {
       </AnimatePresence>
 
       <AnimatePresence mode="wait">
-        {!isComplete ? (
+        {loading ? (
+          <motion.div
+            key="skeleton-right"
+            className="processing-details__right"
+            initial={{ opacity: 1 }}
+            animate={{ opacity: 1 }}
+          >
+            <div className="processing-details__wait-header">
+              <div className="processing-details__skeleton-text processing-details__skeleton-text--icon" />
+              <div className="processing-details__title-wrap">
+                <div className="processing-details__skeleton-text processing-details__skeleton-text--title" />
+              </div>
+            </div>
+            <div className="processing-details__skeleton-text processing-details__skeleton-text--subtitle" />
+            <div className="processing-details__skeleton-text processing-details__skeleton-text--desc" />
+
+            <div className="processing-details__steps">
+              <div className="processing-details__steps-list">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="processing-details__step">
+                    <div className="processing-details__skeleton-text processing-details__skeleton-text--step-icon" />
+                    <div className="processing-details__skeleton-text processing-details__skeleton-text--step-text" />
+                  </div>
+                ))}
+              </div>
+              <div className="processing-details__steps-image">
+                <div className="processing-details__skeleton-text processing-details__skeleton-text--hero-img" />
+              </div>
+            </div>
+          </motion.div>
+        ) : !isComplete ? (
           <motion.div
             key="wait"
             className="processing-details__right"

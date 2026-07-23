@@ -1,9 +1,18 @@
 const fs = require("fs");
 const { GoogleGenerativeAI } = require("@google/generative-ai");
+const logger = require("../utils/logger");
 
 const API_KEY = process.env.GEMINI_API_KEY;
-const MODEL = process.env.GEMINI_MODEL || "gemini-2.0-flash";
-const MAX_RETRIES = 3;
+
+const FALLBACK_CHAIN = [
+  "gemini-3.5-flash",
+  "gemini-2.5-flash",
+  "gemini-2.5-flash-lite",
+  "gemini-2.0-flash",
+];
+
+const MAX_RETRIES_PER_MODEL = 2;
+const RETRY_BASE_DELAY = 2000;
 
 const PROMPT = `Transcribe the speech in this audio file and return ONLY a JSON array.
 No markdown, no code fences, no explanation.
@@ -44,33 +53,32 @@ function parseTranscript(text) {
   return parsed;
 }
 
-async function transcribeAudio(audioPath) {
-  if (!API_KEY) {
-    throw new Error("GEMINI_API_KEY is not set");
-  }
+function isTransientError(err) {
+  const msg = err.message || "";
+  return (
+    msg.includes("429") ||
+    msg.includes("503") ||
+    msg.includes("quota") ||
+    msg.includes("overloaded") ||
+    msg.includes("Service Unavailable") ||
+    msg.includes("resource has been exhausted") ||
+    msg.includes("rate limit")
+  );
+}
 
-  if (!fs.existsSync(audioPath)) {
-    throw new Error(`Audio file not found: ${audioPath}`);
-  }
-
-  const genAI = new GoogleGenerativeAI(API_KEY);
-  const model = genAI.getGenerativeModel({ model: MODEL });
-
-  const audioData = fs.readFileSync(audioPath);
-  const base64Audio = audioData.toString("base64");
-
-  const mimeType = audioPath.endsWith(".mp3") ? "audio/mp3" : "audio/mpeg";
+async function tryModel(genAI, modelName, audioBase64, mimeType) {
+  const model = genAI.getGenerativeModel({ model: modelName });
 
   let lastError;
 
-  for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+  for (let attempt = 1; attempt <= MAX_RETRIES_PER_MODEL; attempt++) {
     try {
       const result = await model.generateContent([
         { text: PROMPT },
         {
           inlineData: {
             mimeType,
-            data: base64Audio,
+            data: audioBase64,
           },
         },
       ]);
@@ -92,21 +100,51 @@ async function transcribeAudio(audioPath) {
     } catch (err) {
       lastError = err;
 
-      const isRateLimit = err.message?.includes("429") || err.message?.includes("quota");
-      const isOverload = err.message?.includes("503") || err.message?.includes("overloaded");
-
-      if (attempt < MAX_RETRIES && (isRateLimit || isOverload)) {
-        const delay = Math.pow(2, attempt) * 1000;
-        console.warn(`[Gemini] Attempt ${attempt} failed (${err.message}), retrying in ${delay}ms...`);
+      if (isTransientError(err) && attempt < MAX_RETRIES_PER_MODEL) {
+        const delay = RETRY_BASE_DELAY * Math.pow(2, attempt - 1);
+        logger.warn(`[${modelName}] Attempt ${attempt} failed, retrying in ${delay}ms...`, { error: err.message });
         await new Promise((r) => setTimeout(r, delay));
         continue;
       }
 
-      break;
+      throw err;
     }
   }
 
-  throw new Error(`Gemini transcription failed after ${MAX_RETRIES} attempts: ${lastError.message}`);
+  throw lastError;
+}
+
+async function transcribeAudio(audioPath) {
+  if (!API_KEY) {
+    throw new Error("GEMINI_API_KEY is not set");
+  }
+
+  if (!fs.existsSync(audioPath)) {
+    throw new Error(`Audio file not found: ${audioPath}`);
+  }
+
+  const audioData = fs.readFileSync(audioPath);
+  const base64Audio = audioData.toString("base64");
+  const mimeType = audioPath.endsWith(".mp3") ? "audio/mp3" : "audio/mpeg";
+
+  const genAI = new GoogleGenerativeAI(API_KEY);
+
+  let lastError;
+
+  for (const modelName of FALLBACK_CHAIN) {
+    try {
+      logger.info(`Trying model: ${modelName}`);
+      const transcript = await tryModel(genAI, modelName, base64Audio, mimeType);
+      logger.info(`Transcription succeeded with: ${modelName}`);
+      return transcript;
+    } catch (err) {
+      lastError = err;
+      logger.warn(`[${modelName}] All attempts failed`, { error: err.message });
+      continue;
+    }
+  }
+
+  throw new Error(`Transcription failed on all models: ${lastError.message}`);
 }
 
 module.exports = { transcribeAudio };

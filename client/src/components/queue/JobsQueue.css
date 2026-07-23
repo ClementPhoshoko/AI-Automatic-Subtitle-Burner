@@ -239,3 +239,74 @@
     padding: var(--space-4);
   }
 }
+
+/* ---- SKELETON ---- */
+
+@keyframes queue-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.jobs-queue__item--skeleton {
+  pointer-events: none;
+}
+
+.jobs-queue__skeleton-circle {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-full);
+  background: var(--surface-2);
+  position: relative;
+  overflow: hidden;
+}
+
+.jobs-queue__skeleton-circle::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
+  background-size: 200% 100%;
+  animation: queue-shimmer 1.5s ease-in-out infinite;
+}
+
+.jobs-queue__skeleton-text {
+  height: 0.75rem;
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  position: relative;
+  overflow: hidden;
+}
+
+.jobs-queue__skeleton-text::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
+  background-size: 200% 100%;
+  animation: queue-shimmer 1.5s ease-in-out infinite;
+}
+
+.jobs-queue__skeleton-text--name {
+  width: 5rem;
+  height: 0.8rem;
+}
+
+.jobs-queue__skeleton-text--time {
+  width: 3rem;
+  margin-top: 4px;
+}
+
+.jobs-queue__skeleton-text--status {
+  width: 3.5rem;
+  height: 1.25rem;
+}
+
+.jobs-queue__skeleton-text--position {
+  width: 3rem;
+  margin-top: 2px;
+}
+
+.jobs-queue__skeleton-text--value {
+  width: 2.5rem;
+  height: 0.75rem;
+}

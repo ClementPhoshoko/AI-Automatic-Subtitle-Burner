@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion'
 import { FiClock, FiAlertCircle, FiVideo, FiCheckCircle, FiGlobe, FiFileText, FiDownload, FiShare2, FiMoreHorizontal, FiPlay } from 'react-icons/fi'
+import { downloadSubtitles, getSubtitlesUrl } from '../../api/jobs'
 import WorkflowTimeline from './WorkflowTimeline'
 import './JobProgressCard.css'
 
@@ -17,6 +18,7 @@ const fadeUp = {
 }
 
 function JobProgressCard({
+  jobId,
   thumbnail,
   title = 'Untitled video',
   format = 'MP4',
@@ -33,6 +35,7 @@ function JobProgressCard({
   errorMessage = '',
   language = 'English',
   subtitlesPercent = 100,
+  outputVideoUrl,
 }) {
   if (empty) {
     return (
@@ -180,16 +183,30 @@ function JobProgressCard({
 
             {/* ACTION BUTTONS */}
             <motion.div className="job-progress-card__actions" variants={fadeUp}>
-              <motion.button className="job-progress-card__action job-progress-card__action--primary" whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+              <motion.button className="job-progress-card__action job-progress-card__action--primary" whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} onClick={() => {
+                if (!outputVideoUrl) return
+                const a = document.createElement('a')
+                a.href = outputVideoUrl
+                a.download = `${title}_burner_akovolabs.${format.toLowerCase()}`
+                document.body.appendChild(a)
+                a.click()
+                a.remove()
+              }}>
                 <FiDownload size={14} />
                 Download Video
               </motion.button>
-              <motion.button className="job-progress-card__action job-progress-card__action--secondary" whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+              <motion.button className="job-progress-card__action job-progress-card__action--secondary" whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} onClick={() => jobId && downloadSubtitles(jobId, `${title}.srt`)}>
                 <FiFileText size={14} />
                 Download Subtitles (.srt)
               </motion.button>
               <div className="job-progress-card__actions-right">
-                <motion.button className="job-progress-card__action job-progress-card__action--secondary" whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                <motion.button className="job-progress-card__action job-progress-card__action--secondary" whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} onClick={() => {
+                  if (navigator.share && outputVideoUrl) {
+                    navigator.share({ title, url: outputVideoUrl })
+                  } else if (outputVideoUrl) {
+                    navigator.clipboard.writeText(outputVideoUrl)
+                  }
+                }}>
                   <FiShare2 size={14} />
                   Share Video
                 </motion.button>
