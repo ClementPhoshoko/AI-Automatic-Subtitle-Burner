@@ -85,18 +85,21 @@ async function processJob(job) {
       logger.warn(`[${jobId}] Thumbnail generation failed (non-blocking)`, { error: thumbErr.message });
     }
 
-    const { error: metaError } = await supabase
-      .from("jobs")
-      .update({
-        duration_seconds: metadata.duration,
-        resolution: metadata.resolution,
-        file_size: metadata.fileSize,
-        thumbnail_url: thumbnailUrl,
-      })
-      .eq("id", jobId);
+    const metaUpdate = {};
+    if (metadata.duration !== null) metaUpdate.duration_seconds = metadata.duration;
+    if (metadata.resolution !== null) metaUpdate.resolution = metadata.resolution;
+    if (metadata.fileSize !== null) metaUpdate.file_size = metadata.fileSize;
+    if (thumbnailUrl !== null) metaUpdate.thumbnail_url = thumbnailUrl;
 
-    if (metaError) {
-      logger.error(`[${jobId}] Failed to store metadata`, { error: metaError.message });
+    if (Object.keys(metaUpdate).length > 0) {
+      const { error: metaError } = await supabase
+        .from("jobs")
+        .update(metaUpdate)
+        .eq("id", jobId);
+
+      if (metaError) {
+        logger.error(`[${jobId}] Failed to store metadata`, { error: metaError.message });
+      }
     }
 
     logger.info(`[${jobId}] Extracting audio...`);
