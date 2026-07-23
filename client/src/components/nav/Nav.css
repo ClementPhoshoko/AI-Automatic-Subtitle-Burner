@@ -8,20 +8,21 @@
   align-items: center;
   justify-content: space-between;
   height: var(--navbar-height);
-  padding-left: 24px;
-  padding-right: 24px;
+  padding-left: var(--space-6);
+  padding-right: var(--space-6);
   color: var(--text-secondary);
-  transition: height 0.35s ease, padding 0.35s ease;
+  transition: height var(--transition-normal), padding var(--transition-normal);
 }
 
 .nav--glass {
   background: var(--glass-bg);
   backdrop-filter: blur(var(--glass-blur));
   -webkit-backdrop-filter: blur(var(--glass-blur));
-  /* box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06); */
+  border-bottom: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
   height: calc(var(--navbar-height) + 8px);
-  padding-left: 32px;
-  padding-right: 32px;
+  padding-left: var(--space-8);
+  padding-right: var(--space-8);
 }
 
 .nav::after {
@@ -34,7 +35,7 @@
   background: linear-gradient(to bottom, var(--glass-bg) 0%, transparent 100%);
   pointer-events: none;
   opacity: 0;
-  transition: opacity 0.35s ease;
+  transition: opacity var(--transition-normal);
 }
 
 .nav--glass::after {
