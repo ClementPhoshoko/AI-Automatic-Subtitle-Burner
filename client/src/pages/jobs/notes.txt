@@ -1,0 +1,279 @@
+Build a Framer Motion State Transition (Processing → Completed)
+
+Do not create a new page or navigate anywhere.
+
+The processing card and completed card are the same React component with two visual states that transition smoothly using Framer Motion.
+
+Maintain 100% of our existing design system (design-tokens.css, spacing, glassmorphism, typography, shadows, radii, blur, gradients, icons, motion language, dark/light themes). Do not introduce new colors or styling outside our token system.
+
+Architecture
+
+Use Framer Motion's recommended pattern.
+
+AnimatePresence mode="wait"
+Each state has a unique key:
+"processing"
+"completed"
+Swap automatically when
+progress >= 100
+
+or
+
+status === "completed"
+
+No route changes.
+No modal.
+No full page refresh.
+
+The component itself morphs into the completion layout.
+
+Motion Philosophy
+
+The transition should feel like the task has finished naturally, not like two pages replacing each other.
+
+The current card should gracefully complete its work before revealing the reward.
+
+Everything should feel premium like Linear, Raycast, Stripe Dashboard or Apple's UI.
+
+Avoid flashy animations.
+
+Keep motion subtle.
+
+Exit Animation (Processing State)
+
+When processing reaches 100%:
+
+progress bar fills completely
+percentage counts to 100%
+last workflow step completes
+queue fades away
+"Processing..." badge changes to Completed
+
+Then animate the whole processing layout:
+
+opacity 1 → 0
+scale 1 → 0.985
+y 0 → -16
+blur slightly (optional via CSS filter)
+
+Duration
+
+0.35–0.45s
+easeInOut
+
+Wait until exit fully completes.
+
+Enter Animation (Completed State)
+
+Only after exit finishes.
+
+Completed layout fades in from the same card.
+
+Animation:
+
+opacity: 0 -> 1
+y: 18 -> 0
+scale: .98 -> 1
+filter: blur(6px) -> blur(0)
+
+Spring:
+
+type: spring
+stiffness: 220
+damping: 24
+mass: .9
+Stagger Children
+
+Reveal children one after another.
+
+Sequence:
+
+Success badge
+Download button
+Subtitle export button
+Share button
+Preview panel
+Processing details
+Completion timeline
+
+Use staggerChildren around
+
+0.06–0.08
+Morph Instead of Pop
+
+Elements shared between both layouts should animate instead of disappearing.
+
+Examples:
+
+Video thumbnail
+
+→ smoothly resizes.
+
+Filename
+
+→ stays in place.
+
+Main container
+
+→ expands vertically.
+
+Top heading
+
+Your video is being processed
+
+crossfades into
+
+Your video is ready to download!
+
+Progress section
+
+→ morphs into download actions.
+
+Workflow timeline
+
+→ morphs into completed timeline.
+
+Use Framer Motion layout and layoutId for shared elements.
+
+Example shared IDs:
+
+layoutId="video-card"
+layoutId="video-thumbnail"
+layoutId="video-title"
+layoutId="status-badge"
+layoutId="workflow"
+
+Do not rebuild these components.
+
+Animate the existing ones.
+
+Success Celebration
+
+Keep it elegant.
+
+When completion appears:
+
+soft glow behind success icon
+subtle radial gradient pulse
+tiny AI sparkle particles
+cloud illustration gently floats
+download icon slightly bounces once
+
+No confetti.
+
+No fireworks.
+
+No excessive motion.
+
+Buttons
+
+Buttons animate independently.
+
+Hover
+
+scale 1.02
+
+Tap
+
+scale .98
+
+Appear with
+
+opacity
+translateY
+Preview Panel
+
+Preview fades upward.
+
+Subtitle overlay crossfades in.
+
+Video controls slide in after the preview appears.
+
+Timeline
+
+Instead of replacing the timeline:
+
+Each unfinished step animates into completed.
+
+Icons rotate slightly.
+
+Circle fills.
+
+Checkmark draws.
+
+Label changes from
+
+Pending
+
+to
+
+Completed
+
+Connection line animates left → right.
+
+Background Motion
+
+Do not change page background.
+
+Keep existing clouds.
+
+Add only:
+
+gentle floating AI stars
+slow ambient gradient shift
+subtle glass reflections
+
+Everything must remain lightweight.
+
+Performance
+
+Use
+
+LazyMotion
+MotionConfig
+layout animations
+AnimatePresence
+useReducedMotion support
+
+Avoid unnecessary re-renders.
+
+Avoid animating expensive properties.
+
+Prefer transforms and opacity.
+
+Component Structure
+<AnimatePresence mode="wait">
+
+    {status === "processing"
+        ? <ProcessingCard key="processing" />
+        : <CompletedCard key="completed" />
+    }
+
+</AnimatePresence>
+
+Shared pieces should use
+
+layout
+layoutId
+
+to create true morphing transitions.
+
+Trigger
+
+The animation should happen automatically when backend state changes.
+
+Example:
+
+status = "processing"
+progress = 98
+
+↓
+
+status = "completed"
+progress = 100
+
+Whether the state comes from polling, Server-Sent Events, or WebSockets, the UI transition should require no additional logic beyond updating the state.
+
+Overall Goal
+
+The finished experience should feel like one intelligent card transforming from "AI is working" into "Your results are ready", with premium micro-interactions, smooth shared-layout animations, and complete consistency with the existing glassmorphism design system. It should feel polished, rewarding, and effortless rather than like navigating between two separate screens.

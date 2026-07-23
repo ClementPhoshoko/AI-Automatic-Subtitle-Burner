@@ -79,6 +79,13 @@
   }
 }
 
+/* ---- CONTENT WRAPPER ---- */
+
+.jobs-content {
+  position: relative;
+  min-height: 300px;
+}
+
 /* ---- TWO-COLUMN LAYOUT ---- */
 
 .jobs-layout {
@@ -92,11 +99,38 @@
   min-width: 0;
 }
 
+.jobs-layout__main--full {
+  flex: 1;
+}
+
 .jobs-layout__sidebar {
   flex: 3;
   min-width: 0;
   position: sticky;
   top: var(--space-6);
+}
+
+.jobs-layout--completed {
+  gap: 0;
+}
+
+/* ---- TOGGLE BUTTON ---- */
+
+.jobs-toggle-btn {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  padding: 12px 20px;
+  background: var(--primary);
+  color: var(--text-inverse);
+  border: none;
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  font-family: var(--font-family);
+  font-size: var(--font-size-sm);
+  font-weight: var(--weight-medium);
+  box-shadow: 0 4px 16px rgba(99, 102, 241, 0.3);
+  z-index: var(--z-sticky);
 }
 
 @media (max-width: 900px) {

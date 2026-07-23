@@ -8,11 +8,15 @@
   padding: var(--space-8);
   opacity: 0.85;
   height: 100%;
-  transition: box-shadow var(--transition-normal), opacity var(--transition-normal);
+  transition: box-shadow 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .job-progress-card:hover {
   box-shadow: var(--shadow-md);
+}
+
+.job-progress-card--expanded {
+  opacity: 1;
 }
 
 /* ---- MAIN LAYOUT ---- */
@@ -63,7 +67,7 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
+  gap: var(--space-4);
   min-width: 0;
 }
 
@@ -215,6 +219,167 @@
 
 .job-progress-card__workflow {
   margin-top: var(--space-5);
+}
+
+/* ---- EXPANDED / COMPLETED STATE ---- */
+
+.job-progress-card--expanded {
+  opacity: 1;
+}
+
+/* VIDEO PLAYER OVERLAY */
+
+.job-progress-card__player-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+  transition: background var(--transition-fast);
+  border-radius: var(--radius-xl);
+}
+
+.job-progress-card__player-overlay:hover {
+  background: rgba(0, 0, 0, 0.35);
+}
+
+.job-progress-card__player-play {
+  font-size: 36px;
+  color: white;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
+}
+
+/* STATS ROW */
+
+.job-progress-card__stats {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  margin-top: var(--space-1);
+}
+
+.job-progress-card__stat {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.job-progress-card__stat-divider {
+  width: 1px;
+  height: 32px;
+  background: var(--border);
+  flex-shrink: 0;
+  margin: 0 var(--space-4);
+}
+
+.job-progress-card__stat-icon-wrap {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-md);
+}
+
+.job-progress-card__stat-icon-wrap--duration {
+  background: var(--primary-soft);
+  color: var(--primary);
+}
+
+.job-progress-card__stat-icon-wrap--language {
+  background: var(--success-soft);
+  color: var(--success);
+}
+
+.job-progress-card__stat-icon-wrap--subtitles {
+  background: var(--warning-soft);
+  color: var(--warning);
+}
+
+.job-progress-card__stat-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.job-progress-card__stat-value {
+  font-size: var(--font-size-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--text-primary);
+  line-height: var(--leading-tight);
+}
+
+.job-progress-card__stat-label {
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+}
+
+/* ACTION BUTTONS */
+
+.job-progress-card__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  margin-top: var(--space-1);
+}
+
+.job-progress-card__actions-right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.job-progress-card__action {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  font-family: var(--font-family);
+  font-size: var(--font-size-xs);
+  font-weight: var(--weight-medium);
+  border: none;
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: background var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.job-progress-card__action--primary {
+  background: var(--primary);
+  color: var(--text-inverse);
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.25);
+}
+
+.job-progress-card__action--primary:hover {
+  background: var(--primary-hover);
+  box-shadow: 0 4px 16px rgba(99, 102, 241, 0.35);
+}
+
+.job-progress-card__action--secondary {
+  background: transparent;
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+}
+
+.job-progress-card__action--secondary:hover {
+  background: var(--surface-2);
+  border-color: var(--text-muted);
+}
+
+.job-progress-card__action--icon {
+  background: transparent;
+  color: var(--text-secondary);
+  padding: var(--space-2);
+  border: 1px solid var(--border);
+}
+
+.job-progress-card__action--icon:hover {
+  background: var(--surface-2);
+  border-color: var(--text-muted);
+  color: var(--text-primary);
 }
 
 /* ---- SKELETON ---- */

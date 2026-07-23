@@ -1,3 +1,5 @@
+import { useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { FiCpu } from 'react-icons/fi'
 import playIcon from '../../assets/Soft tech play icon with cloud.png'
 import starIcon from '../../assets/Symmetrical_gray_star_icon.png'
@@ -7,6 +9,9 @@ import ProcessingDetails from '../../components/processing-details/ProcessingDet
 import './Jobs.css'
 
 function Jobs() {
+  const [status, setStatus] = useState('processing')
+  const [progress, setProgress] = useState(68)
+
   const job = {
     thumbnail: 'https://picsum.photos/seed/video1/640/360',
     title: 'My awesome travel montage 2026.mp4',
@@ -14,8 +19,8 @@ function Jobs() {
     resolution: '1920×1080',
     fileSize: '245 MB',
     duration: '12:34',
-    status: 'processing',
-    progress: 68,
+    status,
+    progress,
     estimatedTime: '2 minutes remaining',
     workflowStage: 2,
     uploadTime: '2 min ago',
@@ -32,6 +37,18 @@ function Jobs() {
     { id: 'job-5', userNumber: 8425, status: 'queued', position: 5, createdAt: min(1) },
     { id: 'job-20', userNumber: 8440, status: 'queued', position: 20, createdAt: min(0.5) },
   ]
+
+  const isComplete = status === 'completed' || progress >= 100
+
+  const handleToggle = () => {
+    if (isComplete) {
+      setStatus('processing')
+      setProgress(68)
+    } else {
+      setStatus('completed')
+      setProgress(100)
+    }
+  }
 
   return (
     <section className="jobs">
@@ -52,32 +69,78 @@ function Jobs() {
         </div>
       </div>
 
-      <div className="jobs-layout">
-        <div className="jobs-layout__main">
-          <JobProgressCard
-            thumbnail={job.thumbnail}
-            title={job.title}
-            format={job.format}
-            resolution={job.resolution}
-            fileSize={job.fileSize}
-            duration={job.duration}
-            status={job.status}
-            progress={job.progress}
-            estimatedTime={job.estimatedTime}
-            workflowStage={job.workflowStage}
-            uploadTime={job.uploadTime}
-          />
-        </div>
-        <div className="jobs-layout__sidebar">
-          <JobsQueue
-            jobs={queueJobs}
-            estimatedWait="~3 minutes"
-            currentUserId="job-20"
-          />
-        </div>
+      <div className="jobs-content">
+        <AnimatePresence mode="wait">
+          {!isComplete ? (
+            <motion.div
+              key="processing-layout"
+              className="jobs-layout"
+              initial={{ opacity: 1 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0, y: -12 }}
+              transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
+            >
+              <div className="jobs-layout__main">
+                <JobProgressCard
+                  thumbnail={job.thumbnail}
+                  title={job.title}
+                  format={job.format}
+                  resolution={job.resolution}
+                  fileSize={job.fileSize}
+                  duration={job.duration}
+                  status={job.status}
+                  progress={job.progress}
+                  estimatedTime={job.estimatedTime}
+                  workflowStage={job.workflowStage}
+                  uploadTime={job.uploadTime}
+                />
+              </div>
+              <div className="jobs-layout__sidebar">
+                <JobsQueue
+                  jobs={queueJobs}
+                  estimatedWait="~3 minutes"
+                  currentUserId="job-20"
+                />
+              </div>
+            </motion.div>
+          ) : (
+            <motion.div
+              key="completed-layout"
+              className="jobs-layout jobs-layout--completed"
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <div className="jobs-layout__main jobs-layout__main--full">
+                <JobProgressCard
+                  thumbnail={job.thumbnail}
+                  title={job.title}
+                  format={job.format}
+                  resolution={job.resolution}
+                  fileSize={job.fileSize}
+                  duration={job.duration}
+                  status={job.status}
+                  progress={job.progress}
+                  estimatedTime={job.estimatedTime}
+                  workflowStage={job.workflowStage}
+                  uploadTime={job.uploadTime}
+                />
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
-      <ProcessingDetails />
+      <ProcessingDetails status={status} />
+
+      <motion.button
+        className="jobs-toggle-btn"
+        onClick={handleToggle}
+        whileHover={{ scale: 1.02 }}
+        whileTap={{ scale: 0.98 }}
+      >
+        {isComplete ? 'Back to Processing' : 'Complete Job'}
+      </motion.button>
     </section>
   )
 }
