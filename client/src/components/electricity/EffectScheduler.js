@@ -6,6 +6,7 @@ import { generateBorderCrawl } from './BorderCrawler'
 import { createSparks } from './SparkSystem'
 
 const recentTargets = new Map()
+const MAX_RECENT_TARGETS = 50
 let lastAmbientTime = 0
 let lastBorderTime = 0
 let lastLightningTime = 0
@@ -52,17 +53,23 @@ function scheduleEffects(now, color, isIdle) {
   }
 
   // Lightning between elements
-  if (boltCount < storm.maxBolts && now - lastLightningTime > lightningInterval) {
+    if (boltCount < storm.maxBolts && now - lastLightningTime > lightningInterval) {
     const cooldown = config.target.cooldown
     let pair = null
     for (let attempt = 0; attempt < 5; attempt++) {
       const p = getNearbyPair(config.target.maxDistance)
       if (!p) break
-      const key = `${p.a.el}-${p.b.el}`
+      const aId = p.a.el ? (p.a.el.dataset.fxId || (p.a.el.dataset.fxId = `el-${Math.random().toString(36).slice(2, 8)}`)) : 'vp'
+      const bId = p.b.el ? (p.b.el.dataset.fxId || (p.b.el.dataset.fxId = `el-${Math.random().toString(36).slice(2, 8)}`)) : 'vp'
+      const key = `${aId}:${bId}`
       const lastTime = recentTargets.get(key) || 0
       if (now - lastTime > cooldown) {
         pair = p
         recentTargets.set(key, now)
+        if (recentTargets.size > MAX_RECENT_TARGETS) {
+          const oldest = recentTargets.keys().next().value
+          recentTargets.delete(oldest)
+        }
         break
       }
     }
@@ -76,7 +83,8 @@ function scheduleEffects(now, color, isIdle) {
 
       window.dispatchEvent(new Event('stormflash'))
 
-      setTimeout(() => { boltCount-- }, bolt.lifetime)
+      const lifetime = bolt.lifetime
+      setTimeout(() => { boltCount = Math.max(0, boltCount - 1) }, lifetime)
     }
   }
 

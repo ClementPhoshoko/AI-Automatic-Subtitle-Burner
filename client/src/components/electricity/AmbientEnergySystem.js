@@ -3,6 +3,7 @@ import { generateMicroArc } from './LightningGenerator'
 import config from './electricityConfig'
 
 const cooldowns = new Map()
+const MAX_COOLDOWNS = 30
 
 function generateAmbientEffect(color) {
   const el = getRandomElement()
@@ -13,6 +14,10 @@ function generateAmbientEffect(color) {
   const last = cooldowns.get(key) || 0
   if (now - last < 2000) return null
   cooldowns.set(key, now)
+  if (cooldowns.size > MAX_COOLDOWNS) {
+    const oldest = cooldowns.keys().next().value
+    cooldowns.delete(oldest)
+  }
 
   const type = Math.random()
   const cx = el.cx + (Math.random() - 0.5) * el.width * 0.6

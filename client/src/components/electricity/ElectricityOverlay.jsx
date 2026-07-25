@@ -41,6 +41,7 @@ function ElectricityOverlay() {
   const [ready, setReady] = useState(false)
   const idleTimer = useRef(null)
   const viewportRef = useRef(getViewport())
+  const [viewport, setViewport] = useState(getViewport())
 
   const handleUpdate = useCallback(({ bolts, sparks }) => {
     const svg = svgRef.current
@@ -57,18 +58,30 @@ function ElectricityOverlay() {
       const draw = drawProgress(progress)
       const flicker = 1 - Math.random() * config.bolt.flickerFrequency
       const alpha = config.bolt.coreOpacity * flicker * (1 - progress)
+      const glowA = config.bolt.glowOpacity * flicker * (1 - progress)
 
       const mainD = BoltD(bolt.segments)
       const mainLen = totalLength(bolt.segments)
       const offset = mainLen * (1 - draw)
 
+      // outer glow layer
+      if (glowA > 0) {
+        inner += `<path d="${mainD}" fill="none" stroke="${hexToRgba(primary, glowA * 0.4)}" stroke-width="${bolt.thickness * config.bolt.glowSpread}" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="${mainLen}" stroke-dashoffset="${offset}" filter="url(#bolt-glow)"/>`
+      }
+
       // main bolt — draws from start to end
       inner += `<path d="${mainD}" fill="none" stroke="${hexToRgba(primary, alpha)}" stroke-width="${bolt.thickness}" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="${mainLen}" stroke-dashoffset="${offset}"/>`
-      inner += `<path d="${mainD}" fill="none" stroke="rgba(255,255,255,${alpha * 0.5})" stroke-width="${Math.max(bolt.thickness * 0.4, 0.3)}" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="${mainLen}" stroke-dashoffset="${offset}"/>`
+      inner += `<path d="${mainD}" fill="none" stroke="rgba(255,255,255,${alpha * 0.6})" stroke-width="${Math.max(bolt.thickness * 0.4, 0.5)}" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="${mainLen}" stroke-dashoffset="${offset}"/>`
 
       for (const bD of bolt.branches) {
         const bLen = totalLength(bD)
         const bOff = bLen * (1 - draw)
+
+        // branch glow
+        if (glowA > 0) {
+          inner += `<path d="${BoltD(bD)}" fill="none" stroke="${hexToRgba(primary, glowA * 0.25)}" stroke-width="${Math.max(bolt.thickness * 0.45, 0.3) * config.bolt.glowSpread}" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="${bLen}" stroke-dashoffset="${bOff}" filter="url(#bolt-glow)"/>`
+        }
+
         inner += `<path d="${BoltD(bD)}" fill="none" stroke="${hexToRgba(primary, alpha * 0.7)}" stroke-width="${Math.max(bolt.thickness * 0.45, 0.3)}" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="${bLen}" stroke-dashoffset="${bOff}"/>`
         inner += `<path d="${BoltD(bD)}" fill="none" stroke="rgba(255,255,255,${alpha * 0.35})" stroke-width="${Math.max(bolt.thickness * 0.25, 0.2)}" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="${bLen}" stroke-dashoffset="${bOff}"/>`
       }
@@ -82,7 +95,13 @@ function ElectricityOverlay() {
       inner += `<circle cx="${s.x.toFixed(1)}" cy="${s.y.toFixed(1)}" r="${Math.max(s.size * 0.4 * (1 - progress * 0.5), 0.5)}" fill="rgba(255,255,255,${alpha * 0.5})"/>`
     }
 
-    svg.innerHTML = inner
+    let group = svg.querySelector('.fx-layer')
+    if (!group) {
+      group = document.createElementNS('http://www.w3.org/2000/svg', 'g')
+      group.classList.add('fx-layer')
+      svg.appendChild(group)
+    }
+    group.innerHTML = inner
   }, [])
 
   useEffect(() => {
@@ -90,8 +109,21 @@ function ElectricityOverlay() {
   }, [])
 
   useEffect(() => {
+    const onResize = () => {
+      const vp = getViewport()
+      viewportRef.current = vp
+      setViewport(vp)
+    }
+    window.addEventListener('resize', onResize)
+    return () => window.removeEventListener('resize', onResize)
+  }, [])
+
+  useEffect(() => {
     if (!ready) return
-    if (viewportRef.current === 'mobile') return
+    if (viewport === 'mobile') {
+      stop()
+      return
+    }
 
     const primary = getComputedColor('--primary') || '#6366f1'
     start(primary, handleUpdate)
@@ -115,16 +147,22 @@ function ElectricityOverlay() {
       window.removeEventListener('keydown', onActivity)
       window.removeEventListener('touchstart', onActivity)
     }
-  }, [ready, handleUpdate])
+  }, [ready, handleUpdate, viewport])
 
-  if (viewportRef.current === 'mobile') return null
+  if (viewport === 'mobile') return null
 
   return (
     <svg
       ref={svgRef}
       className="electricity-overlay"
       aria-hidden="true"
-    />
+    >
+      <defs>
+        <filter id="bolt-glow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur in="SourceGraphic" stdDeviation="6" />
+        </filter>
+      </defs>
+    </svg>
   )
 }
 
