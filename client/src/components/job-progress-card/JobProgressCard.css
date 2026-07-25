@@ -571,4 +571,8 @@
     -webkit-backdrop-filter: none;
     box-shadow: none;
   }
+
+  .job-progress-card:hover {
+    box-shadow: none;
+  }
 }

@@ -250,6 +250,11 @@
     -webkit-backdrop-filter: none;
     box-shadow: none;
   }
+
+  .processing-details__left:hover,
+  .processing-details__right:hover {
+    box-shadow: none;
+  }
 }
 
 /* ---- SKELETON ---- */
