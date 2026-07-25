@@ -2,12 +2,146 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="/burner_logo_with_bg.png" />
+    <link rel="apple-touch-icon" href="/burner_logo_with_bg.png" />
+
+    <!-- Primary Meta Tags -->
+    <title>Burner — AI Subtitle Generator for Videos | Free Online Tool</title>
+    <meta name="title" content="Burner — AI Subtitle Generator for Videos | Free Online Tool" />
+    <meta name="description" content="Upload your video and get accurate, AI-generated subtitles in minutes. Burner uses Google Gemini to transcribe speech and burn subtitles into your videos automatically. Free, fast, and secure." />
+    <meta name="keywords" content="AI subtitle generator, automatic subtitle maker, video subtitle burner, burn subtitles into video, AI video transcription, Google Gemini subtitles, free subtitle tool, online subtitle generator, add captions to video, SRT generator" />
+    <meta name="author" content="AkovoLabs" />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://burner.akovolabs.co.za/" />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://burner.akovolabs.co.za/" />
+    <meta property="og:title" content="Burner — AI Subtitle Generator for Videos" />
+    <meta property="og:description" content="Upload your video and get accurate, AI-generated subtitles in minutes. Powered by Google Gemini. Free, fast, and secure." />
+    <meta property="og:image" content="https://burner.akovolabs.co.za/burner_logo_with_bg.png" />
+    <meta property="og:image:alt" content="Burner — AI Subtitle Generator logo" />
+    <meta property="og:image:width" content="512" />
+    <meta property="og:image:height" content="512" />
+    <meta property="og:site_name" content="Burner" />
+    <meta property="og:locale" content="en_US" />
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://burner.akovolabs.co.za/" />
+    <meta property="twitter:title" content="Burner — AI Subtitle Generator for Videos" />
+    <meta property="twitter:description" content="Upload your video and get accurate, AI-generated subtitles in minutes. Powered by Google Gemini. Free, fast, and secure." />
+    <meta property="twitter:image" content="https://burner.akovolabs.co.za/burner_logo_with_bg.png" />
+    <meta property="twitter:image:alt" content="Burner — AI Subtitle Generator logo" />
+
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-    <title>Subtitle Burner</title>
+
+    <!-- Structured Data (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Burner",
+      "alternateName": "AI Subtitle Burner",
+      "url": "https://burner.akovolabs.co.za",
+      "description": "Upload your video and get accurate, AI-generated subtitles in minutes. Burner uses Google Gemini to transcribe speech and burn subtitles into your videos automatically.",
+      "applicationCategory": "MultimediaApplication",
+      "operatingSystem": "Web Browser",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "creator": {
+        "@type": "Organization",
+        "name": "AkovoLabs",
+        "url": "https://akovolabs.co.za"
+      },
+      "featureList": [
+        "AI-powered video transcription using Google Gemini",
+        "Automatic subtitle generation in SRT and ASS formats",
+        "Subtitle burning directly into video files",
+        "Multiple subtitle styles: Classic, TikTok, Minimal, Cinema, Apple, Netflix, YouTube",
+        "Drag-and-drop video upload",
+        "Support for MP4, MOV, MKV, and WebM formats",
+        "Real-time processing status updates",
+        "Secure and private file handling"
+      ],
+      "screenshot": "https://burner.akovolabs.co.za/burner_logo_with_bg.png",
+      "softwareHelp": {
+        "@type": "CreativeWork",
+        "url": "https://burner.akovolabs.co.za"
+      }
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is Burner?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Burner is a free online tool that uses AI to generate subtitles for your videos. Upload a video, and Burner will automatically transcribe the speech, generate synchronized subtitles, and burn them into the video for download."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What video formats does Burner support?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Burner supports MP4, MOV, MKV, and WebM video formats. The maximum file size is 50 MB."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How does the AI subtitle generation work?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Burner uses Google Gemini to analyze the audio in your video and produce a timestamped transcript. The transcript is then converted into subtitles and burned into the video using FFmpeg."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is Burner free to use?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes, Burner is completely free to use. There are no hidden fees or subscription requirements."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What subtitle styles are available?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Burner offers seven subtitle styles: Classic, TikTok, Minimal, Cinema, Apple, Netflix, and YouTube. Each style has its own font, size, color, and positioning."
+          }
+        }
+      ]
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://burner.akovolabs.co.za/"
+        }
+      ]
+    }
+    </script>
   </head>
   <body>
     <div id="root"></div>

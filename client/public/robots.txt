@@ -1,0 +1,10 @@
+# Burner — AI Subtitle Generator
+# https://burner.akovolabs.co.za
+
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /api-docs
+Disallow: /jobs/
+
+Sitemap: https://burner.akovolabs.co.za/sitemap.xml
