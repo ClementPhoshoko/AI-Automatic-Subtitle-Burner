@@ -220,14 +220,17 @@ function JobProgressCard({
 
             {/* ACTION BUTTONS */}
             <motion.div className="job-progress-card__actions" variants={fadeUp}>
-              <motion.button className="job-progress-card__action job-progress-card__action--primary" whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} onClick={() => {
+              <motion.button className="job-progress-card__action job-progress-card__action--primary" whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} onClick={async () => {
                 if (!outputVideoUrl) return
                 const a = document.createElement('a')
-                a.href = outputVideoUrl
+                const res = await fetch(outputVideoUrl)
+                const blob = await res.blob()
+                a.href = URL.createObjectURL(blob)
                 a.download = `${title}_burner_akovolabs.${format.toLowerCase()}`
                 document.body.appendChild(a)
                 a.click()
                 a.remove()
+                URL.revokeObjectURL(a.href)
               }}>
                 <FiDownload size={14} />
                 Download Video
