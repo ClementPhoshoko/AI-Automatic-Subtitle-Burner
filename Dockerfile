@@ -1,4 +1,4 @@
-FROM node:20-alpine AS build
+FROM node:22-alpine AS build
 
 WORKDIR /app/client
 
@@ -10,7 +10,7 @@ RUN npm run build
 
 # ── Production ──────────────────────────────────────────────
 
-FROM node:20-alpine
+FROM node:22-alpine
 
 RUN apk add --no-cache ffmpeg
 
