@@ -5,7 +5,6 @@ import {
   formatFileSize,
   formatJobTitle,
   getFileExtension,
-  mapStatusToProgress,
   mapStatusToWorkflowStage,
   formatRelativeTime,
 } from '../utils/format'
@@ -26,7 +25,6 @@ function transformJob(raw) {
     durationRaw: raw.duration_seconds,
     thumbnail: raw.thumbnail_url || null,
     status: raw.status,
-    progress: mapStatusToProgress(raw.status),
     workflowStage: mapStatusToWorkflowStage(raw.status),
     estimatedTime: '',
     uploadTime: formatRelativeTime(raw.created_at),
@@ -45,6 +43,9 @@ export function useJobProgress(id) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const timerRef = useRef(null)
+  const progressRef = useRef(0)
+  const progressTimerRef = useRef(null)
+  const [displayProgress, setDisplayProgress] = useState(0)
 
   const stopPolling = useCallback(() => {
     if (timerRef.current) {
@@ -53,17 +54,52 @@ export function useJobProgress(id) {
     }
   }, [])
 
+  const stopProgress = useCallback(() => {
+    if (progressTimerRef.current) {
+      clearInterval(progressTimerRef.current)
+      progressTimerRef.current = null
+    }
+  }, [])
+
+  const startProgress = useCallback(() => {
+    if (progressTimerRef.current) return
+    progressRef.current = 10
+    setDisplayProgress(10)
+    progressTimerRef.current = setInterval(() => {
+      const remaining = 95 - progressRef.current
+      const step = Math.max(0.5, remaining * 0.04)
+      progressRef.current = Math.min(progressRef.current + step, 95)
+      setDisplayProgress(Math.round(progressRef.current))
+    }, 1000)
+  }, [])
+
   const doPoll = useCallback(async () => {
     if (!id) return null
     const raw = await fetchJob(id)
     const transformed = transformJob(raw)
     setJob(transformed)
     setError(null)
-    if (STOP_STATUSES.includes(raw.status)) {
+
+    if (raw.status === 'completed') {
+      stopProgress()
+      progressRef.current = 100
+      setDisplayProgress(100)
       stopPolling()
+    } else if (raw.status === 'failed') {
+      stopProgress()
+      progressRef.current = 0
+      setDisplayProgress(0)
+      stopPolling()
+    } else if (raw.status === 'processing') {
+      startProgress()
+    } else {
+      stopProgress()
+      progressRef.current = 0
+      setDisplayProgress(0)
     }
+
     return raw
-  }, [id, stopPolling])
+  }, [id, stopPolling, stopProgress, startProgress])
 
   useEffect(() => {
     if (!id) return
@@ -80,6 +116,7 @@ export function useJobProgress(id) {
           raw: err.raw,
         })
         stopPolling()
+        stopProgress()
       } finally {
         if (active) setLoading(false)
       }
@@ -91,14 +128,16 @@ export function useJobProgress(id) {
         await doPoll()
       } catch {
         stopPolling()
+        stopProgress()
       }
     }, POLL_INTERVAL)
 
     return () => {
       active = false
       stopPolling()
+      stopProgress()
     }
-  }, [id, doPoll, stopPolling])
+  }, [id, doPoll, stopPolling, stopProgress])
 
-  return { job, loading, error }
+  return { job, loading, error, displayProgress }
 }

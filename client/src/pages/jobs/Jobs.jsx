@@ -19,7 +19,7 @@ const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
 function Jobs() {
   const { jobId } = useParams()
   const navigate = useNavigate()
-  const { job, loading, error } = useJobProgress(jobId)
+  const { job, loading, error, displayProgress } = useJobProgress(jobId)
   const { jobs: queueJobs, estimatedWait, loading: queueLoading } = useQueue(jobId)
 
   const isComplete = job?.status === 'completed'
@@ -212,7 +212,7 @@ function Jobs() {
                   fileSize={job.fileSize}
                   duration={job.duration}
                   status={job.status}
-                  progress={job.progress}
+                  progress={displayProgress}
                   estimatedTime={job.estimatedTime}
                   workflowStage={job.workflowStage}
                   uploadTime={job.uploadTime}
