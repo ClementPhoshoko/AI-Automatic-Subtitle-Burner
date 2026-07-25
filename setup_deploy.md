@@ -120,7 +120,7 @@ chmod 600 ~/.ssh/authorized_keys
 ### Step 3: Test SSH connection
 
 ```bash
-ssh -i ~/.ssh/github_deploy root@your-vps-ip
+ssh -i ~/.ssh/github_deploy ubuntu@your-vps-ip
 # Should connect without password prompt
 ```
 
@@ -131,7 +131,7 @@ Go to your repo → **Settings** → **Secrets and variables** → **Actions** �
 | Secret | Value |
 |---|---|
 | `VPS_HOST` | Your VPS IP (e.g. `123.45.67.89`) |
-| `VPS_USER` | `root` |
+| `VPS_USER` | `ubuntu` |
 | `VPS_SSH_KEY` | Copy the **entire** private key: `cat ~/.ssh/github_deploy` |
 
 > Copy the full output including `-----BEGIN OPENSSH PRIVATE KEY-----` and `-----END OPENSSH PRIVATE KEY-----`.
