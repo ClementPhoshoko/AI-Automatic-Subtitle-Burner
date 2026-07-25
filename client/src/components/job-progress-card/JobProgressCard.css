@@ -535,7 +535,7 @@
 
 /* ---- RESPONSIVE ---- */
 
-@media (max-width: 768px) {
+@media (max-width: 767px) {
   .job-progress-card__main {
     flex-direction: column;
   }
