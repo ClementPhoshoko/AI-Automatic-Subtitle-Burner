@@ -633,7 +633,7 @@
     font-size: var(--font-size-xs);
     gap: var(--space-1);
     background: transparent;
-    border: 1px solid var(--border);
+    border: none;
     color: var(--text-secondary);
     border-radius: var(--radius-full);
     min-width: 36px;
@@ -648,9 +648,25 @@
   .job-progress-card__action--primary {
     background: transparent;
     color: var(--primary);
-    border-color: var(--primary);
+    border: none;
     box-shadow: none;
   }
+
+  .job-progress-card__action--primary:hover {
+    background: transparent;
+  }
+
+  .job-progress-card__action-label {
+    display: none;
+  }
+
+  .job-progress-card__action-label-short {
+    display: inline;
+  }
+}
+
+.job-progress-card__action-label-short {
+  display: none;
 }
 
 @media (max-width: 640px) {
@@ -669,4 +685,8 @@
   .job-progress-card__progress-top {
     flex-wrap: wrap;
   }
+  .job-progress-card__meta-item {
+    font-size: var(--font-size-sm);
+  }
+
 }

@@ -233,23 +233,26 @@ function JobProgressCard({
                 URL.revokeObjectURL(a.href)
               }}>
                 <FiDownload size={14} />
-                Download Video
+                <span className="job-progress-card__action-label">Download Video</span>
+                <span className="job-progress-card__action-label-short">Video</span>
               </motion.button>
               <motion.button className="job-progress-card__action job-progress-card__action--secondary" whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} onClick={() => jobId && downloadSubtitles(jobId, `${title}.srt`)}>
                 <FiFileText size={14} />
-                Download Subtitles (.srt)
+                <span className="job-progress-card__action-label">Download Subtitles</span>
+                <span className="job-progress-card__action-label-short">Subtitles</span>
+              </motion.button>
+              <motion.button className="job-progress-card__action job-progress-card__action--secondary" whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} onClick={() => {
+                if (navigator.share && outputVideoUrl) {
+                  navigator.share({ title, url: outputVideoUrl })
+                } else if (outputVideoUrl) {
+                  navigator.clipboard.writeText(outputVideoUrl)
+                }
+              }}>
+                <FiShare2 size={14} />
+                <span className="job-progress-card__action-label">Share Link</span>
+                <span className="job-progress-card__action-label-short">Share</span>
               </motion.button>
               <div className="job-progress-card__actions-right">
-                <motion.button className="job-progress-card__action job-progress-card__action--secondary" whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} onClick={() => {
-                  if (navigator.share && outputVideoUrl) {
-                    navigator.share({ title, url: outputVideoUrl })
-                  } else if (outputVideoUrl) {
-                    navigator.clipboard.writeText(outputVideoUrl)
-                  }
-                }}>
-                  <FiShare2 size={14} />
-                  Share Video
-                </motion.button>
                 <motion.button className="job-progress-card__action job-progress-card__action--icon" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                   <FiMoreHorizontal size={16} />
                 </motion.button>

@@ -158,3 +158,76 @@
     right: calc(-50% + 26px);
   }
 }
+
+@media (max-width: 767px) {
+  .workflow-timeline {
+    padding-top: var(--space-4);
+    gap: 0;
+  }
+
+  .workflow-timeline__stage {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .workflow-timeline__icon-wrap {
+    width: 32px;
+    height: 32px;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .workflow-timeline__icon-wrap--completed {
+    background: transparent;
+    color: var(--primary);
+    box-shadow: none;
+    border: 1.5px solid var(--primary);
+  }
+
+  .workflow-timeline__icon-wrap--active {
+    background: transparent;
+    color: var(--primary);
+    box-shadow: none;
+    border: 1.5px solid var(--primary);
+    animation: none;
+  }
+
+  .workflow-timeline__icon-wrap--pending {
+    background: transparent;
+    border: 1.5px solid var(--border);
+  }
+
+  .workflow-timeline__icon-wrap--failed {
+    background: transparent;
+    color: var(--danger);
+    box-shadow: none;
+    border: 1.5px solid var(--danger);
+  }
+
+  .workflow-timeline__icon {
+    font-size: 14px;
+  }
+
+  .workflow-timeline__connector {
+    top: 16px;
+    left: calc(50% + 20px);
+    right: calc(-50% + 20px);
+    border-top-width: 1.5px;
+  }
+
+  .workflow-timeline__connector--completed {
+    border-top-style: solid;
+  }
+
+  .workflow-timeline__info {
+    margin-top: var(--space-1);
+  }
+
+  .workflow-timeline__label {
+    font-size: 0.5625rem;
+  }
+
+  .workflow-timeline__status {
+    display: none;
+  }
+}
