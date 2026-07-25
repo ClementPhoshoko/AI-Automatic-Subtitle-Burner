@@ -10,6 +10,7 @@ dotenv.config();
 const jobsRouter = require("./routes/jobs");
 const swaggerSpec = require("./docs/swagger");
 const worker = require("./workers/processor");
+const cleanup = require("./workers/cleanup");
 const logger = require("./utils/logger");
 
 const app = express();
@@ -60,7 +61,8 @@ const server = app.listen(PORT, () => {
   logger.info("Server started", { port: PORT, env: process.env.NODE_ENV || "development" });
   if (process.env.WORKER_ENABLED === "true") {
     worker.start();
-    logger.info("Worker enabled");
+    cleanup.start();
+    logger.info("Worker + cleanup enabled");
   } else {
     logger.info("Worker disabled (set WORKER_ENABLED=true to enable)");
   }

@@ -211,7 +211,7 @@ async function deleteJob(req, res) {
 
     const { data: job, error: fetchError } = await supabase
       .from("jobs")
-      .select("id, original_video_url, output_video_url")
+      .select("id, original_video_url, output_video_url, thumbnail_url")
       .eq("id", id)
       .single();
 
@@ -229,6 +229,11 @@ async function deleteJob(req, res) {
     if (job.output_video_url) {
       const outputName = job.output_video_url.split("/").pop();
       if (outputName) filesToRemove.push({ bucket: "processed", name: outputName });
+    }
+
+    if (job.thumbnail_url) {
+      const thumbName = job.thumbnail_url.split("/").pop();
+      if (thumbName) filesToRemove.push({ bucket: "thumbnails", name: thumbName });
     }
 
     for (const file of filesToRemove) {
