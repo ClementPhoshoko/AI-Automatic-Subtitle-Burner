@@ -3,6 +3,13 @@ import { start, stop, handleActivity, setIdle } from './MotionController'
 import config from './electricityConfig'
 import './ElectricityOverlay.css'
 
+function getViewport() {
+  const w = window.innerWidth
+  if (w < 768) return 'mobile'
+  if (w < 1024) return 'tablet'
+  return 'desktop'
+}
+
 function getComputedColor(varName) {
   return getComputedStyle(document.documentElement).getPropertyValue(varName).trim()
 }
@@ -33,6 +40,7 @@ function ElectricityOverlay() {
   const svgRef = useRef(null)
   const [ready, setReady] = useState(false)
   const idleTimer = useRef(null)
+  const viewportRef = useRef(getViewport())
 
   const handleUpdate = useCallback(({ bolts, sparks }) => {
     const svg = svgRef.current
@@ -83,6 +91,7 @@ function ElectricityOverlay() {
 
   useEffect(() => {
     if (!ready) return
+    if (viewportRef.current === 'mobile') return
 
     const primary = getComputedColor('--primary') || '#6366f1'
     start(primary, handleUpdate)
@@ -107,6 +116,8 @@ function ElectricityOverlay() {
       window.removeEventListener('touchstart', onActivity)
     }
   }, [ready, handleUpdate])
+
+  if (viewportRef.current === 'mobile') return null
 
   return (
     <svg

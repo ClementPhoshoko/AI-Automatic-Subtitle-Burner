@@ -7,3 +7,17 @@
   pointer-events: none;
   z-index: 9999;
 }
+
+/* Tablet — reduce visual density */
+@media (max-width: 1023px) {
+  .electricity-overlay {
+    opacity: 0.5;
+  }
+}
+
+/* Mobile — disable entirely, skip rendering overhead */
+@media (max-width: 767px) {
+  .electricity-overlay {
+    display: none;
+  }
+}

@@ -218,3 +218,65 @@
     animation: none;
   }
 }
+
+/* ==========================================================================
+   TABLET — Reduce density
+   ========================================================================== */
+@media (max-width: 1023px) {
+  .storm {
+    height: 35vh;
+  }
+
+  .storm__puff--5,
+  .storm__puff--6,
+  .storm__wisp--b {
+    display: none;
+  }
+
+  .storm__puff--1 { width: 320px; height: 210px; filter: blur(40px); }
+  .storm__puff--2 { width: 290px; height: 230px; filter: blur(35px); }
+  .storm__puff--3 { width: 380px; height: 200px; filter: blur(45px); }
+  .storm__puff--4 { width: 260px; height: 180px; filter: blur(30px); }
+}
+
+/* ==========================================================================
+   MOBILE — Minimal atmospheric effect
+   ========================================================================== */
+@media (max-width: 767px) {
+  .storm {
+    height: 20vh;
+  }
+
+  .storm__puff--3,
+  .storm__puff--4,
+  .storm__puff--5,
+  .storm__puff--6,
+  .storm__wisp--a,
+  .storm__wisp--b,
+  .storm__mist {
+    display: none;
+  }
+
+  .storm__haze {
+    filter: blur(50px);
+    opacity: 0.6;
+  }
+
+  .storm__puff--1 {
+    width: 200px;
+    height: 140px;
+    filter: blur(30px);
+    opacity: 0.7;
+  }
+
+  .storm__puff--2 {
+    width: 180px;
+    height: 150px;
+    filter: blur(25px);
+    opacity: 0.6;
+  }
+
+  .storm__flash {
+    background: radial-gradient(ellipse 120% 80% at 50% 20%, rgba(130, 110, 240, 0.10) 0%, rgba(80, 60, 200, 0.03) 40%, transparent 70%);
+  }
+}
