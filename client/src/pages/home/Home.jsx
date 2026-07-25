@@ -150,16 +150,16 @@ function Home() {
 
       <div className="home-features">
         <span className="home-feature">
-          <FiCpu className="home-feature-icon home-feature-icon--primary" size={16} />
-          Powered by Google Gemini
+          <FiCpu className="home-feature-icon home-feature-icon--primary" size={14} />
+          AI Powered
         </span>
         <span className="home-feature">
-          <FiRefreshCw className="home-feature-icon home-feature-icon--info" size={16} />
-          Asynchronous Processing
+          <FiRefreshCw className="home-feature-icon home-feature-icon--info" size={14} />
+          Async Processing
         </span>
         <span className="home-feature">
-          <FiShield className="home-feature-icon home-feature-icon--success" size={16} />
-          Secure & Scalable Design
+          <FiShield className="home-feature-icon home-feature-icon--success" size={14} />
+          Secure &amp; Scalable
         </span>
       </div>
 

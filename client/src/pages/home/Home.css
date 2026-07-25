@@ -48,6 +48,8 @@
   border: 1px solid var(--border);
   border-radius: var(--radius-full);
   transition: all var(--transition-fast);
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .home-feature:hover {
@@ -237,4 +239,212 @@
   min-width: 36px;
   text-align: right;
   font-variant-numeric: tabular-nums;
+}
+
+/* ==========================================================================
+   TABLET (MD) — 768–1023px
+   ========================================================================== */
+@media (max-width: 1023px) {
+  .home {
+    padding: var(--space-20) var(--space-4) var(--space-12);
+  }
+
+  .home-heading {
+    font-size: clamp(var(--font-size-2xl), 5vw, var(--font-size-4xl));
+    max-width: 520px;
+  }
+
+  .home-upload {
+    max-width: 480px;
+    margin-top: var(--space-12);
+  }
+
+  .home-upload-zone {
+    padding: var(--space-10) var(--space-5);
+  }
+
+  .home-upload-icon {
+    width: 52px;
+    height: 52px;
+  }
+}
+
+/* ==========================================================================
+   MOBILE (SM) — 480–767px
+   ========================================================================== */
+@media (max-width: 767px) {
+  .home {
+    padding: var(--space-20) var(--space-4) var(--space-8);
+  }
+
+  .home-heading {
+    font-size: clamp(1.5rem, 6vw, var(--font-size-3xl));
+    max-width: 100%;
+  }
+
+  .home-star-icon {
+    width: 18px;
+    height: 18px;
+  }
+
+  .home-subtitle {
+    font-size: var(--font-size-md);
+    margin-top: var(--space-4);
+    max-width: 100%;
+  }
+
+  .home-features {
+    gap: 0;
+    margin-top: var(--space-4);
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .home-feature {
+    font-size: var(--font-size-xs);
+    padding: 0;
+    background: none;
+    border: none;
+    border-radius: 0;
+    gap: var(--space-1);
+    color: var(--text-muted);
+  }
+
+  .home-feature-icon {
+    display: none;
+  }
+
+  .home-features .home-feature + .home-feature::before {
+    content: '·';
+    margin: 0 var(--space-2);
+    color: var(--text-disabled);
+  }
+
+  .home-upload {
+    max-width: 308px;
+    margin-top: var(--space-6);
+  }
+
+  .home-upload-zone {
+    padding: var(--space-6) var(--space-3);
+    margin: var(--space-2);
+    gap: var(--space-2);
+  }
+
+  .home-upload-icon {
+    width: 40px;
+    height: 40px;
+  }
+
+  .home-upload-prompt {
+    font-size: var(--font-size-sm);
+  }
+
+  .home-upload-or {
+    font-size: var(--font-size-xs);
+  }
+
+  .home-upload-info {
+    font-size: 0.625rem;
+  }
+
+  .home-upload-zone .btn {
+    height: var(--button-sm);
+    padding: 0 var(--space-3);
+    font-size: var(--font-size-xs);
+    max-width: 80%;
+  }
+
+  .drop-overlay {
+    padding: var(--space-6);
+  }
+
+  .drop-overlay__box {
+    height: 220px;
+    max-width: 90vw;
+  }
+
+  .drop-overlay__corner {
+    width: 28px;
+    height: 28px;
+  }
+
+  .drop-overlay__text {
+    font-size: var(--font-size-lg);
+  }
+
+  .home-upload-progress {
+    padding: 0 var(--space-4) var(--space-4);
+  }
+}
+
+/* ==========================================================================
+   EXTRA SMALL (XS) — 0–479px
+   ========================================================================== */
+@media (max-width: 479px) {
+  .home {
+    padding: var(--space-16) var(--space-3) var(--space-6);
+  }
+
+  .home-heading {
+    font-size: 1.375rem;
+  }
+
+  .home-star-icon {
+    width: 16px;
+    height: 16px;
+  }
+
+  .home-subtitle {
+    font-size: var(--font-size-sm);
+  }
+
+  .home-features {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .home-feature {
+    justify-content: center;
+  }
+
+  .home-upload {
+    max-width: 243px;
+  }
+
+  .home-upload-zone {
+    padding: var(--space-4) var(--space-2);
+    margin: var(--space-1);
+    gap: var(--space-1);
+  }
+
+  .home-upload-icon {
+    width: 28px;
+    height: 28px;
+  }
+
+  .home-upload-prompt {
+    font-size: var(--font-size-xs);
+  }
+
+  .home-upload-or {
+    font-size: 0.5625rem;
+  }
+
+  .home-upload-info {
+    font-size: 0.5rem;
+  }
+
+  .home-upload-zone .btn {
+    height: 28px;
+    padding: 0 var(--space-2);
+    font-size: 0.625rem;
+    max-width: 80%;
+  }
+
+  .btn--md {
+    height: var(--button-lg);
+    width: 100%;
+    max-width: 240px;
+  }
 }

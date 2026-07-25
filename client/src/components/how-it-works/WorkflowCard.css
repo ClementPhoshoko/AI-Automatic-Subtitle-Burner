@@ -6,7 +6,7 @@
   gap: var(--space-2);
   padding: var(--space-4) var(--space-4) var(--space-6);
   background: transparent;
-  border: 1px solid transparent;
+  border: 0px solid transparent;
   border-radius: var(--radius-xl);
   box-shadow: none;
   transition: all var(--transition-normal);
@@ -71,4 +71,101 @@
   color: var(--text-secondary);
   line-height: var(--leading-normal);
   margin: 0;
+}
+
+.workflow-card-text {
+  display: flex;
+  flex-direction: column;
+  align-items: inherit;
+  gap: var(--space-1);
+}
+
+/* ==========================================================================
+   TABLET (MD) — 768–1023px
+   ========================================================================== */
+@media (max-width: 1023px) {
+  .workflow-card {
+    min-width: 140px;
+    max-width: 180px;
+  }
+
+  .workflow-card-icon-wrap {
+    width: 68px;
+    height: 68px;
+  }
+}
+
+/* ==========================================================================
+   MOBILE (SM) — 480–767px
+   ========================================================================== */
+@media (max-width: 767px) {
+  .workflow-card {
+    min-width: 0;
+    max-width: 85%;
+    width: 100%;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: flex-start;
+    text-align: left;
+    gap: var(--space-3);
+    padding: var(--space-4);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+  }
+
+  .workflow-card:hover {
+    border-color: var(--border-strong);
+    background: var(--surface);
+  }
+
+  .workflow-card-icon-wrap {
+    width: 48px;
+    height: 48px;
+    min-width: 48px;
+    border-radius: var(--radius-md);
+  }
+
+  .workflow-card-text {
+    align-items: flex-start;
+  }
+
+  .workflow-card-step {
+    display: none;
+  }
+
+  .workflow-card-title {
+    font-size: var(--font-size-sm);
+    margin-bottom: 2px;
+  }
+
+  .workflow-card-desc {
+    font-size: var(--font-size-xs);
+    line-height: var(--leading-relaxed);
+  }
+}
+
+/* ==========================================================================
+   EXTRA SMALL (XS) — 0–479px
+   ========================================================================== */
+@media (max-width: 479px) {
+  .workflow-card {
+    max-width: 100%;
+    padding: var(--space-3);
+    gap: var(--space-2);
+  }
+
+  .workflow-card-icon-wrap {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+  }
+
+  .workflow-card-title {
+    font-size: var(--font-size-xs);
+  }
+
+  .workflow-card-desc {
+    font-size: 0.6875rem;
+  }
 }

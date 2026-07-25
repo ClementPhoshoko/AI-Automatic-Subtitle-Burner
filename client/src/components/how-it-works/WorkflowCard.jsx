@@ -14,9 +14,11 @@ function WorkflowCard({ iconSrc, stepNumber, title, description, index }) {
       <div className="workflow-card-icon-wrap">
         <img className="workflow-card-icon" src={iconSrc} alt="" />
       </div>
-      <span className="workflow-card-step">{stepNumber}</span>
-      <h3 className="workflow-card-title">{title}</h3>
-      <p className="workflow-card-desc">{description}</p>
+      <div className="workflow-card-text">
+        <span className="workflow-card-step">{stepNumber}</span>
+        <h3 className="workflow-card-title">{title}</h3>
+        <p className="workflow-card-desc">{description}</p>
+      </div>
     </motion.div>
   )
 }

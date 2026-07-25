@@ -58,3 +58,56 @@
   60%  { opacity: 0; }
   100% { opacity: 1; }
 }
+
+/* ==========================================================================
+   TABLET — Slightly smaller branding
+   ========================================================================== */
+@media (max-width: 1023px) {
+  .intro-brand {
+    gap: 0;
+  }
+
+  .intro-brand span {
+    margin-left: calc(var(--space-1) * -1);
+  }
+
+  .intro-brand img {
+    width: 64px;
+    height: 64px;
+  }
+
+  .intro-brand span {
+    font-size: var(--font-size-lg);
+  }
+
+  .intro-tagline {
+    font-size: var(--font-size-base);
+  }
+}
+
+/* ==========================================================================
+   MOBILE — Compact branding, no brand text
+   ========================================================================== */
+@media (max-width: 767px) {
+  .intro-center {
+    gap: var(--space-10);
+  }
+
+  .intro-brand {
+    gap: var(--space-3);
+  }
+
+  .intro-brand img {
+    width: 56px;
+    height: 56px;
+  }
+
+  .intro-brand span {
+    display: none;
+  }
+
+  .intro-tagline {
+    font-size: var(--font-size-sm);
+    letter-spacing: 0.05em;
+  }
+}

@@ -4,6 +4,24 @@
   align-items: center;
   width: 100%;
   padding: var(--space-20) var(--space-6);
+  position: relative;
+}
+
+.how-section::after {
+  content: '';
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60%;
+  max-width: 500px;
+  height: 8px;
+  background: var(--primary);
+  border-radius: var(--radius-full);
+  filter: blur(20px);
+  opacity: 0.3;
+  pointer-events: none;
+  z-index: 0;
 }
 
 .how-title {
@@ -44,9 +62,17 @@
   }
 }
 
-@media (max-width: 1024px) {
+/* ==========================================================================
+   TABLET (MD) — 768–1023px
+   ========================================================================== */
+@media (max-width: 1023px) {
+  .how-section {
+    padding: var(--space-16) var(--space-4);
+  }
+
   .how-cards {
     flex-wrap: wrap;
+    gap: var(--space-3);
   }
 
   .how-line {
@@ -54,9 +80,20 @@
   }
 }
 
-@media (max-width: 640px) {
+/* ==========================================================================
+   MOBILE (SM) — 480–767px
+   ========================================================================== */
+@media (max-width: 767px) {
   .how-section {
     padding: var(--space-12) var(--space-4);
+  }
+
+  .how-section::after {
+    width: 75%;
+    bottom: -8px;
+    height: 10px;
+    filter: blur(16px);
+    opacity: 0.5;
   }
 
   .how-title {
@@ -67,5 +104,20 @@
   .how-cards {
     flex-direction: column;
     align-items: center;
+    gap: var(--space-3);
+  }
+}
+
+/* ==========================================================================
+   EXTRA SMALL (XS) — 0–479px
+   ========================================================================== */
+@media (max-width: 479px) {
+  .how-section {
+    padding: var(--space-10) var(--space-3);
+  }
+
+  .how-title {
+    font-size: 1.25rem;
+    margin-bottom: var(--space-6);
   }
 }

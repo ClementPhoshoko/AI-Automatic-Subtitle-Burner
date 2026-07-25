@@ -3,10 +3,15 @@ import { motion } from 'framer-motion'
 import logo from '../../assets/burner_logo_with_no_bg.png'
 import './IntroOverlay.css'
 
+const DESKTOP_BP = 1024
+
 function IntroOverlay({ onDone }) {
   const [phase, setPhase] = useState('intro')
   const [dockDelta, setDockDelta] = useState(null)
   const doneRef = useRef(false)
+  const isDesktop = useRef(
+    typeof window !== 'undefined' && window.innerWidth >= DESKTOP_BP
+  ).current
 
   const handleDone = useCallback(() => {
     if (!doneRef.current) {
@@ -16,13 +21,19 @@ function IntroOverlay({ onDone }) {
   }, [onDone])
 
   useEffect(() => {
-    const t1 = setTimeout(() => setPhase('dock'), 2200)
-    const t2 = setTimeout(() => setPhase('fade'), 3100)
-    const t3 = setTimeout(handleDone, 3700)
-    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3) }
-  }, [handleDone])
+    if (isDesktop) {
+      const t1 = setTimeout(() => setPhase('dock'), 2200)
+      const t2 = setTimeout(() => setPhase('fade'), 3100)
+      const t3 = setTimeout(handleDone, 3700)
+      return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3) }
+    }
+    const t1 = setTimeout(() => setPhase('fade'), 1500)
+    const t2 = setTimeout(handleDone, 2100)
+    return () => { clearTimeout(t1); clearTimeout(t2) }
+  }, [handleDone, isDesktop])
 
   useEffect(() => {
+    if (!isDesktop) return
     if (phase === 'dock') {
       requestAnimationFrame(() => {
         const brandEl = document.querySelector('.intro-brand')
@@ -38,7 +49,7 @@ function IntroOverlay({ onDone }) {
         }
       })
     }
-  }, [phase])
+  }, [phase, isDesktop])
 
   const brandAnimate = () => {
     if (phase === 'intro') {
@@ -47,7 +58,7 @@ function IntroOverlay({ onDone }) {
         scale: [0.6, 2.8, 3.0, 2.6, 2.9, 2.7],
       }
     }
-    if (dockDelta) {
+    if (isDesktop && dockDelta) {
       return {
         x: dockDelta.x,
         y: dockDelta.y,
@@ -55,7 +66,7 @@ function IntroOverlay({ onDone }) {
         opacity: 1,
       }
     }
-    return { opacity: 1, scale: 2.7 }
+    return { opacity: 1, scale: 1 }
   }
 
   const brandTransition = () => {

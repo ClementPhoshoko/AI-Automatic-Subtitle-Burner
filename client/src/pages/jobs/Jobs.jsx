@@ -91,10 +91,12 @@ function Jobs() {
               ? 'This video was automatically removed after 2 hours. Files are temporary to keep our system fast.'
               : 'The job you\'re looking for doesn\'t exist or has been removed. Please try uploading again.'}
           </p>
-          <button className="jobs-not-found__btn" onClick={() => navigate('/')}>
-            <FiArrowLeft size={16} />
-            Back to Home
-          </button>
+          <div className="jobs-not-found__actions">
+            <button className="jobs-not-found__btn" onClick={() => navigate('/')}>
+              <FiArrowLeft size={16} />
+              Back to Home
+            </button>
+          </div>
         </motion.div>
       </section>
     )
@@ -118,10 +120,12 @@ function Jobs() {
           <p className="jobs-not-found__desc">
             This job does not exist or has been removed.
           </p>
-          <button className="jobs-not-found__btn" onClick={() => navigate('/')}>
-            <FiArrowLeft size={16} />
-            Back to Home
-          </button>
+          <div className="jobs-not-found__actions">
+            <button className="jobs-not-found__btn" onClick={() => navigate('/')}>
+              <FiArrowLeft size={16} />
+              Back to Home
+            </button>
+          </div>
         </motion.div>
       </section>
     )
