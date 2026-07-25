@@ -546,13 +546,15 @@
   }
 }
 
+@media (max-width: 1023px) {
+  .job-progress-card__stat-divider {
+    display: none;
+  }
+}
+
 @media (max-width: 767px) {
   .job-progress-card__stats {
     gap: var(--space-2);
-  }
-
-  .job-progress-card__stat-divider {
-    display: none;
   }
 
   .job-progress-card__stat {
