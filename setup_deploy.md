@@ -61,19 +61,32 @@ curl http://localhost:3001/api/health
 # Should return: {"status":"ok","timestamp":"..."}
 ```
 
-## 4. Nginx
+## 4. Reverse Proxy (Caddy)
+
+This guide assumes Caddy is already running on the VPS (e.g. for another site).
+Add the burner site to the existing Caddyfile — Caddy handles SSL automatically.
 
 ```bash
-sudo cp nginx.conf /etc/nginx/sites-available/burner.akovolabs.co.za
-sudo ln -s /etc/nginx/sites-available/burner.akovolabs.co.za /etc/nginx/sites-enabled/
-sudo nginx -t && sudo systemctl restart nginx
+sudo tee -a /etc/caddy/Caddyfile <<'EOF'
+
+burner.akovolabs.co.za {
+	request_body {
+		max_size 200MB
+	}
+	reverse_proxy localhost:3001
+}
+EOF
+
+sudo caddy validate --config /etc/caddy/Caddyfile
+sudo systemctl restart caddy
 ```
+
+> If using Nginx instead of Caddy, see `nginx.conf` in the repo root for the config.
 
 ## 5. SSL
 
-```bash
-sudo certbot --nginx -d burner.akovolabs.co.za
-```
+Caddy provisions and renews SSL certificates automatically — no manual steps needed.
+Once DNS points to your VPS, `https://burner.akovolabs.co.za` will work immediately.
 
 ## 6. Auto-Deploy (GitHub Actions)
 
