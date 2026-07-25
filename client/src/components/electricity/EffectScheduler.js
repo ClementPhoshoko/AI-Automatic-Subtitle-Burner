@@ -31,17 +31,14 @@ function getStormIntensity(now) {
   }
 }
 
-function scheduleEffects(now, color, isIdle, viewport = 'desktop') {
+function scheduleEffects(now, color, isIdle) {
   const fx = { bolts: [], sparks: [], ambient: [], borders: [] }
   const intensity = isIdle ? config.ambient.idleMultiplier : 1.0
   const storm = getStormIntensity(now)
 
-  const mobileScale = viewport === 'mobile' ? 0.4 : viewport === 'tablet' ? 0.7 : 1.0
-
-  const ambientInterval = (storm.ambientInterval / intensity) / mobileScale
-  const lightningInterval = (storm.lightningInterval / intensity) / mobileScale
-  const borderInterval = config.border.crawlFrequency / intensity / mobileScale
-  const maxBolts = Math.max(1, Math.floor(storm.maxBolts * mobileScale))
+  const ambientInterval = storm.ambientInterval / intensity
+  const lightningInterval = storm.lightningInterval / intensity
+  const borderInterval = config.border.crawlFrequency / intensity
 
   // Ambient micro effects
   if (now - lastAmbientTime > ambientInterval * 0.5 + Math.random() * ambientInterval * 0.5) {
@@ -56,7 +53,7 @@ function scheduleEffects(now, color, isIdle, viewport = 'desktop') {
   }
 
   // Lightning between elements
-  if (boltCount < maxBolts && now - lastLightningTime > lightningInterval) {
+  if (boltCount < storm.maxBolts && now - lastLightningTime > lightningInterval) {
     const cooldown = config.target.cooldown
     let pair = null
     for (let attempt = 0; attempt < 5; attempt++) {

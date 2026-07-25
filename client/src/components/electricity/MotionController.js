@@ -59,7 +59,7 @@ function tick(now) {
   const isIdle = state.isIdle
 
   // Schedule new effects
-  const newFx = scheduleEffects(now, state.color, isIdle, state.viewport)
+  const newFx = scheduleEffects(now, state.color, isIdle)
 
   // Merge bolts
   const bolts = [...state.effects.bolts]
