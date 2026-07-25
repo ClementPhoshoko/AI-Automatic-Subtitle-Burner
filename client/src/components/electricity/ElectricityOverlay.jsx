@@ -120,13 +120,9 @@ function ElectricityOverlay() {
 
   useEffect(() => {
     if (!ready) return
-    if (viewport === 'mobile') {
-      stop()
-      return
-    }
 
     const primary = getComputedColor('--primary') || '#6366f1'
-    start(primary, handleUpdate)
+    start(primary, handleUpdate, viewport)
 
     const onActivity = () => {
       handleActivity()
@@ -148,8 +144,6 @@ function ElectricityOverlay() {
       window.removeEventListener('touchstart', onActivity)
     }
   }, [ready, handleUpdate, viewport])
-
-  if (viewport === 'mobile') return null
 
   return (
     <svg

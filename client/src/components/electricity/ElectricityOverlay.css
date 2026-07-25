@@ -15,9 +15,9 @@
   }
 }
 
-/* Mobile — disable entirely, skip rendering overhead */
+/* Mobile — subtle electricity */
 @media (max-width: 767px) {
   .electricity-overlay {
-    display: none;
+    opacity: 0.3;
   }
 }

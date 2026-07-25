@@ -12,13 +12,15 @@ const state = {
   color: '',
   onUpdate: null,
   hidden: false,
+  viewport: 'desktop',
 }
 
-function start(color, onUpdate) {
+function start(color, onUpdate, viewport = 'desktop') {
   if (state.running) return
   state.running = true
   state.color = color
   state.onUpdate = onUpdate
+  state.viewport = viewport
   state.lastTick = performance.now()
 
   document.addEventListener('visibilitychange', handleVisibility)
@@ -57,7 +59,7 @@ function tick(now) {
   const isIdle = state.isIdle
 
   // Schedule new effects
-  const newFx = scheduleEffects(now, state.color, isIdle)
+  const newFx = scheduleEffects(now, state.color, isIdle, state.viewport)
 
   // Merge bolts
   const bolts = [...state.effects.bolts]
