@@ -582,6 +582,23 @@
   .job-progress-card__stat-label {
     font-size: 0.625rem;
   }
+
+  .job-progress-card__percentage {
+    font-size: var(--font-size-sm);
+  }
+
+  .job-progress-card__eta {
+    font-size: 0.625rem;
+  }
+
+  .job-progress-card__status-badge {
+    font-size: 0.625rem;
+    padding: var(--space-1) var(--space-2);
+  }
+
+  .job-progress-card__bar {
+    height: 10px;
+  }
 }
 
 @media (max-width: 640px) {
