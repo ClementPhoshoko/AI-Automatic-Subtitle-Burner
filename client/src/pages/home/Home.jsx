@@ -47,7 +47,7 @@ function Home() {
     setProgress(0)
 
     try {
-      const job = await uploadVideo(file, 'classic', (pct) => setProgress(pct))
+      const job = await uploadVideo(file, 'classic', (pct) => setProgress(Math.min(pct, 95)))
 
       setProgress(100)
 
