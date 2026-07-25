@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react'
 import { motion } from 'framer-motion'
-import { FiClock, FiAlertCircle, FiVideo, FiCheckCircle, FiGlobe, FiFileText, FiDownload, FiShare2, FiMoreHorizontal, FiPlay } from 'react-icons/fi'
+import { FiClock, FiAlertCircle, FiVideo, FiCheckCircle, FiGlobe, FiFileText, FiDownload, FiShare2, FiPlay } from 'react-icons/fi'
 import { downloadSubtitles, getSubtitlesUrl } from '../../api/jobs'
 import WorkflowTimeline from './WorkflowTimeline'
 import './JobProgressCard.css'
@@ -252,11 +252,6 @@ function JobProgressCard({
                 <span className="job-progress-card__action-label">Share Link</span>
                 <span className="job-progress-card__action-label-short">Share</span>
               </motion.button>
-              <div className="job-progress-card__actions-right">
-                <motion.button className="job-progress-card__action job-progress-card__action--icon" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                  <FiMoreHorizontal size={16} />
-                </motion.button>
-              </div>
             </motion.div>
 
             {/* EXPIRATION NOTICE */}
