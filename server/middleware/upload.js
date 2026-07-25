@@ -3,7 +3,7 @@ const path = require("path");
 const os = require("os");
 const { isValidVideo } = require("../utils/helpers");
 
-const maxFileSize = (parseInt(process.env.MAX_FILE_SIZE_MB, 10) || 500) * 1024 * 1024;
+const maxFileSize = (parseInt(process.env.MAX_FILE_SIZE_MB, 10) || 50) * 1024 * 1024;
 
 const storage = multer.diskStorage({
   destination: path.join(os.tmpdir(), "subtitle-burner"),
@@ -17,7 +17,7 @@ const fileFilter = (req, file, cb) => {
   if (isValidVideo(file.mimetype, file.originalname)) {
     cb(null, true);
   } else {
-    cb(new Error(`Invalid file type: ${file.mimetype}. Allowed: MP4, MOV, AVI, MKV`));
+    cb(new Error(`Invalid file type: ${file.mimetype}. Allowed: MP4, MOV, MKV, WebM`));
   }
 };
 

@@ -10,7 +10,8 @@ import './Home.css'
 
 const ALLOWED_TYPES = ['video/mp4', 'video/quicktime', 'video/x-matroska', 'video/webm']
 const ALLOWED_EXT = '.mp4,.mov,.mkv,.webm'
-const MAX_SIZE = 50 * 1024 * 1024
+const MAX_SIZE_MB = 50
+const MAX_SIZE = MAX_SIZE_MB * 1024 * 1024
 
 function Home() {
   const navigate = useNavigate()
@@ -33,7 +34,7 @@ function Home() {
       return false
     }
     if (file.size > MAX_SIZE) {
-      showError('File too large', `Maximum allowed size is 50 MB. This file is ${(file.size / (1024 * 1024)).toFixed(1)} MB.`)
+      showError('File too large', `Maximum allowed size is ${MAX_SIZE_MB} MB. This file is ${(file.size / (1024 * 1024)).toFixed(1)} MB.`)
       return false
     }
     return true
@@ -45,24 +46,14 @@ function Home() {
     setUploading(true)
     setProgress(0)
 
-    let current = 0
-    const interval = setInterval(() => {
-      const remaining = 95 - current
-      const step = Math.max(1, Math.ceil(remaining * 0.08))
-      current = Math.min(current + step, 95)
-      setProgress(current)
-    }, 200)
-
     try {
-      const job = await uploadVideo(file, 'classic')
+      const job = await uploadVideo(file, 'classic', (pct) => setProgress(pct))
 
-      clearInterval(interval)
       setProgress(100)
 
       await new Promise((r) => setTimeout(r, 600))
       navigate(`/jobs/${job.id}`)
     } catch (err) {
-      clearInterval(interval)
       showError(err.title || 'Upload failed', err.message || 'Something went wrong. Please try again.')
       setUploading(false)
       setProgress(0)
@@ -180,7 +171,7 @@ function Home() {
               <button className="btn btn--md btn--secondary" type="button" onClick={(e) => { e.stopPropagation(); handleClick() }}>Browse Files</button>
             </>
           )}
-          <p className="home-upload-info">Supports MP4, MOV, MKV, WebM (Max 50mb)</p>
+          <p className="home-upload-info">Supports MP4, MOV, MKV, WebM · Max 50 MB · Max 15 min</p>
           <input ref={inputRef} type="file" accept={ALLOWED_EXT} onChange={handleChange} hidden />
         </div>
         {uploading && (

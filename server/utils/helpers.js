@@ -1,11 +1,11 @@
 const ALLOWED_MIMES = {
   "video/mp4": ".mp4",
   "video/quicktime": ".mov",
-  "video/x-msvideo": ".avi",
   "video/x-matroska": ".mkv",
+  "video/webm": ".webm",
 };
 
-const ALLOWED_EXTENSIONS = [".mp4", ".mov", ".avi", ".mkv"];
+const ALLOWED_EXTENSIONS = [".mp4", ".mov", ".mkv", ".webm"];
 
 const SUBTITLE_STYLES = ["classic", "tiktok", "minimal", "cinema", "apple", "netflix", "youtube"];
 

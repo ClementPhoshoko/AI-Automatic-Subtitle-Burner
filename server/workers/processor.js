@@ -14,6 +14,7 @@ const POLL_INTERVAL_MS = 5000;
 const STALE_SWEEP_MS = 60000;
 const STALE_TIMEOUT_MIN = 10;
 const MAX_CONCURRENCY = 2;
+const MAX_DURATION_MIN = parseInt(process.env.MAX_DURATION_MINUTES, 10) || 15;
 
 const activeJobs = new Set();
 
@@ -100,6 +101,10 @@ async function processJob(job) {
       if (metaError) {
         logger.error(`[${jobId}] Failed to store metadata`, { error: metaError.message });
       }
+    }
+
+    if (metadata.duration && metadata.duration > MAX_DURATION_MIN * 60) {
+      throw new Error(`Video is ${Math.round(metadata.duration / 60)} minutes long. Maximum allowed is ${MAX_DURATION_MIN} minutes.`);
     }
 
     logger.info(`[${jobId}] Extracting audio...`);
